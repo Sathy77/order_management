@@ -27,15 +27,8 @@ class Generichelps(Minihelps):
     def prepareData(self, objects, fieldsname): # New
         preparedData = []
 
-        if fieldsname == 'personal': fields = self.getPresonalData()
-        elif fieldsname == 'office': fields = self.getOfficeData()
-        elif fieldsname == 'salaryleaves': fields = self.getSalaryLeavesData()
-        elif fieldsname == 'emergencycontact': fields = self.getEmergencyContactData()
-        elif fieldsname == 'academicrecord': fields = self.getAcademicRecordData()
-        elif fieldsname == 'previousexperience': fields = self.getPreviousExperienceData()
-        elif fieldsname == 'basicinfo': fields = self.getBasicInfoData()
-        elif fieldsname == 'userdocument': fields = self.getUserDocumentData()
-        elif fieldsname == 'noticeboard': fields = self.getNoticeBoardData()
+        if fieldsname == 'product': fields = self.getProductData()
+        
 
         if isinstance(objects, dict):
             preparedData.append(self.getOBJDetails(objects, fields))

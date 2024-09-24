@@ -207,37 +207,18 @@ class Picohelps:
    #          {'field': 'gross_salary', 'replace': 'gross_salary', 'obj': salaryAndLeaves},
    #      ]
    
-   # def getPresonalData(self):
-   #    return {
-   #             'fieldlist': [
-   #                {'field': 'first_name', 'type': 'str'},
-   #                {'field': 'last_name', 'type': 'str'},
-   #                {'field': 'gender', 'type': 'str'},
-   #                {'field': 'dob', 'type': 'str'},
-   #                {'field': 'blood_group', 'type': 'str'},
-   #                {'field': 'fathers_name', 'type': 'str'},
-   #                {'field': 'mothers_name', 'type': 'str'},
-   #                {'field': 'marital_status', 'type': 'str'},
-   #                {'field': 'spouse_name', 'type': 'str'},
-   #                {'field': 'nationality', 'type': 'str'},
-   #                {'field': 'religion', 'type': 'int'},
-   #                {'field': 'personal_email', 'type': 'str'},
-   #                {'field': 'personal_phone', 'type': 'str'},
-   #                {'field': 'nid_passport_no', 'type': 'str'},
-   #                {'field': 'tin_no', 'type': 'str'},
-   #                {'field': 'permanentAddressSameAsPresent', 'type': 'bool'}
-   #             ],
-   #             'nestedfields': [
-   #                {
-   #                      'field': 'present_address',
-   #                      'fieldlist': [{'field': 'city', 'type': 'str'}, {'field': 'state_division', 'type': 'str'}, {'field': 'post_zip_code', 'type': 'str'}, {'field': 'country', 'type': 'str'}, {'field': 'address', 'type': 'str'}]
-   #                },
-   #                {
-   #                      'field': 'permanent_address',
-   #                      'fieldlist': [{'field': 'city', 'type': 'str'}, {'field': 'state_division', 'type': 'str'}, {'field': 'post_zip_code', 'type': 'str'}, {'field': 'country', 'type': 'str'}, {'field': 'address', 'type': 'str'}]
-   #                }
-   #             ]
-   #          }
+   def getProductData(self):
+      return {
+               'fieldlist': [
+                  {'field': 'name', 'type': 'str'},
+                  {'field': 'photo', 'type': 'str'},
+                  {'field': 'gallery', 'type': 'str'},
+                  {'field': 'weight', 'type': 'str'},
+                  {'field': 'quntity', 'type': 'int'},
+                  {'field': 'costprice', 'type': 'str'},
+                  {'field': 'mrpprice', 'type': 'str'},
+               ]
+            }
    
    
    def removeFile(self, OBJ, key):

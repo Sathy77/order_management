@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from helps.choice import common as CHOICE
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from drf_nested_forms.utils import NestedForm
 
 # Create your views here.
 
@@ -46,11 +47,12 @@ def getproducts(request):
 @permission_classes([IsAuthenticated])
 # @deco.get_permission(['get company info', 'all'])
 def addproduct(request):
-    # requestdata = dict(request.data)
-    # requestdata.update({'abcdef[abcdef]': ['abcdef']})
-    requestdata = request.data.copy()
-    print(requestdata)
-    input()
+    requestdata = dict(request.data)
+    requestdata.update({'abcdef[abcdef]': ['abcdef']})
+    options = {'allow_blank': True, 'allow_empty': False}
+    form = NestedForm(requestdata, **options)
+    form.is_nested(raise_exception=True)
+    requestdata = ghelp().prepareData(form.data, 'product')
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
@@ -64,4 +66,43 @@ def addproduct(request):
         required_fields=required_fields
     )
     if response_data: response_data = response_data.data
+    return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+# @deco.get_permission(['Get Permission list Details', 'all'])
+def updateproduct(request, productid=None):
+    requestdata = dict(request.data)
+    requestdata.update({'abcdef[abcdef]': ['abcdef']})
+    options = {'allow_blank': True, 'allow_empty': False}
+    form = NestedForm(requestdata, **options)
+    form.is_nested(raise_exception=True)
+    requestdata = ghelp().prepareData(form.data, 'product')
+    print(requestdata)
+    userid = request.user.id
+    extra_fields = {}
+    if userid: extra_fields.update({'updated_by': userid})
+    allowed_fields=['name', 'photo', 'weight', 'quntity', 'costprice', 'mrpprice']
+    static_fields = ['photo']
+    response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+        classOBJ=MODELS_PROD.Product, 
+        Serializer=POST_SRLZER_PROD.Productserializer, 
+        id=productid, 
+        data=requestdata,
+        allowed_fields=allowed_fields,
+        # fields_regex=fields_regex,
+        static_fields=static_fields
+    )
+    response_data = response_data.data if response_successflag == 'success' else {}
+    return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+# @deco.get_permission(['Get Permission list Details', 'all'])
+def deleteuser(request, uuserid=None):
+    response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
+        classOBJ=MODELS_USER.User,
+        id=uuserid,
+        
+    )
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
