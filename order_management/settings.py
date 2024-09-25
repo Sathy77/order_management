@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     # 'contribution.apps.ContributionConfig',
     'user.apps.UserConfig',
     'user_auth.apps.UserAuthConfig',
-    'product.apps.ProductConfig'
-    # 'company.apps.CompanyConfig',
-    # 'branch.apps.BranchConfig',
+    'product.apps.ProductConfig',
+    'zone.apps.ZoneConfig',
+    'order.apps.OrderConfig',
     # 'department.apps.DepartmentConfig',
     # 'facility.apps.FacilityConfig',
     # 'attendance.apps.AttendanceConfig',

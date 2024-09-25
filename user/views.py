@@ -33,12 +33,12 @@ def getusers(request):
     page_size = int(request.GET.get('page_size')) if request.GET.get('page_size') else 10
     if page and page_size: users=users[(page-1)*page_size:page*page_size]
 
-    usergserializers = GET_SRLZER_USER.Userserializer(users, many=True)
+    userserializers = GET_SRLZER_USER.Userserializer(users, many=True)
     return Response({'data': {
         'count': total_count,
         'page': page,
         'page_size': page_size,
-        'result': usergserializers.data
+        'result': userserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
