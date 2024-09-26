@@ -2,7 +2,7 @@ GENDER = (('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other'),)
 PAYMENT_MODE = (
     ('Cash on Delivery','Cash on Delivery'), 
     ('Credit/Debit Card', 'Credit/Debit Card'), 
-    ('Mobile Wallet', 'Mobile Wallet')
+    ('Mobile Wallet', 'Mobile Wallet'),
 )
 ORDER_STATUS = (
     ('Pending','Pending'),
@@ -28,7 +28,7 @@ MARITAL_STATUS = (
     ('Married', 'Married'),
     ('Widowed', 'Widowed'),
     ('Divorced', 'Divorced'),
-    ('Separated ', 'Separated')
+    ('Separated ', 'Separated'),
 )
 
 # DAYS = (('Saturday', 'Saturday'), ('Sunday', 'Sunday'), ('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'), ('Friday', 'Friday'))
