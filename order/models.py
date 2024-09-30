@@ -28,7 +28,7 @@ class Ordersummary(Basic):
     # updated_by = models.ForeignKey(MODELS_USER.User, on_delete=models.SET_NULL, null=True, blank=True, related_name='zone_updated_by')
 
     def __str__(self):
-        return f'{self.user} - {self.date}' 
+        return f'{self.id} - {self.date}' 
     
 class Orderitems(Basic):
     ordersummary = models.ForeignKey(Ordersummary, on_delete=models.CASCADE, related_name='orderitems_ordersummary')

@@ -18,6 +18,7 @@ class User(AbstractUser):
 
     # designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, blank=True, null=True) # Mandatory
     ###
+    user_type = models.CharField(max_length=25, choices=CHOICE.USER_TYPE , default=CHOICE.USER_TYPE[1][1])
     dob = models.DateField(blank=True, null=True)
     blood_group = models.CharField(max_length=25, choices=CHOICE.BLOOD_GROUP, blank=True, null=True)
     fathers_name = models.CharField(max_length=150, blank=True, null=True)

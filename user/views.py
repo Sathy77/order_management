@@ -46,9 +46,9 @@ def getusers(request):
 # @deco.get_permission(['get company info', 'all'])
 def adduser(request):
     requestdata = request.data.copy()
-    userid = request.user.id
-    extra_fields = {}
-    if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
+    # userid = request.user.id
+    # extra_fields = {}
+    # if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
     required_fields = ['name', 'address', 'contact_no']
     if 'password' in requestdata: requestdata['password'] = make_password(requestdata['password'])
     response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
@@ -56,7 +56,7 @@ def adduser(request):
         Serializer=POST_SRLZER_USER.Userserializer, 
         data=requestdata, 
         unique_fields=[], 
-        extra_fields=extra_fields, 
+        # extra_fields=extra_fields, 
         required_fields=required_fields
     )
     if response_data: response_data = response_data.data
