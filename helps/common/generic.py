@@ -5,6 +5,94 @@ import calendar
 
 class Generichelps(Minihelps):
 
+    # ORDER
+    def purifyProducts(self, Product, data):
+        response = {'message': [], 'products': {}}
+        products = data.get('products')
+        if products:
+            if isinstance(products, list):
+                for product in products:
+                    order_quantity = product.get('order_quantity')
+                    if isinstance(order_quantity, str):
+                        if order_quantity.isnumeric(): order_quantity = int(order_quantity)
+                        else:
+                            response['message'].append(f'order_quantity should be type of int!')
+                            break
+                    else:
+                        if not isinstance(order_quantity, int):
+                            response['message'].append(f'order_quantity should be type of int!')
+                            break
+                    productid = product.get('id')
+                    if productid:
+                        product = Product.objects.filter(id=productid)
+                        if product.exists():
+                            if product.first().costprice:
+                                if product.first().mrpprice:
+                                    if product.first().quntity:
+                                        if product.first().quntity>=order_quantity:
+                                            response['products'].update({str(product.first().id): {'product': product, 'quantity': order_quantity}})
+                                        else:
+                                            response['message'].append(f'less products are available({product.first().quntity}) then required({order_quantity})!')
+                                            break
+                                    else:
+                                        response['message'].append(f'quntity doesn\'t exist, product id({productid})!')
+                                        break
+                                else:
+                                    response['message'].append(f'mrpprice doesn\'t exist, product id({productid})!')
+                                    break
+                            else:
+                                response['message'].append(f'costprice doesn\'t exist, product id({productid})!')
+                                break
+                        else:
+                            response['message'].append(f'product doesn\'t exist with this id({productid})!')
+                            break
+                    else:
+                        response['message'].append('please provide productid!')
+                        break
+            else: response['message'].append('products type should be list!')
+        else: response['message'].append('products list is required!')
+        return response
+    
+
+    # ORDER
+    def calculateProductCalculation(self, products, discount, deliverycost):
+        product_cost = 0
+        trade_cost = 0
+
+        for productkey in products.keys():
+            product = products[productkey]['product']
+            order_quantity = products[productkey]['quantity']
+
+            unit_trade_price = product.first().costprice
+            unit_mrp = product.first().mrpprice
+
+            product_cost +=  unit_mrp*order_quantity
+            trade_cost += unit_trade_price*order_quantity
+        product_cost -= discount
+        
+        grand_total = product_cost + deliverycost
+        total_profit = product_cost - trade_cost
+        return product_cost, grand_total, total_profit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def getPermissionsList(self, User, username, permissions, all=False, active=False, inactive=False):
         if all + active + inactive == 1:
             user = User.objects.filter(username=username)
