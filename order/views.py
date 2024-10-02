@@ -10,6 +10,7 @@ from order.serializer.POST import serializers as POST_SRLZER_ORDE
 from user.serializer.POST import serializers as POST_SRLZER_USER
 from django.contrib.auth.hashers import make_password
 from helps.common.generic import Generichelps as ghelp
+from helps.choice import common as CHOICE
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from datetime import date
@@ -199,6 +200,7 @@ def addorderitems(request):
     requestdata = request.data.copy()
     userid = request.user.id
     user = MODELS_USER.User.objects.get(id=userid)
+    print("jjjjjjjjjjjjjjjjjjjjj",requestdata)
 
     contact_no = request.data.get('contact_no')
     user = MODELS_USER.User.objects.filter(contact_no=contact_no) 
@@ -237,13 +239,19 @@ def addorderitems(request):
     if delevaryzoneid:
         delevaryzone = MODELS_ZONE.Deliveryzone.objects.filter(id=delevaryzoneid)
         if delevaryzone.exists():
-            if request.data.get('free_delivery'):
+            if not request.data.get('free_delivery'):
                 deliverycost = delevaryzone.first().cost if delevaryzone.first().cost else 0
             todate = date.today()
-            payment_mode = request.data.get('payment_mode')
+            payment_mode = request.data.get('payment_mode') ## frontend theke valu dile recive korbe na dile none pathabe
+            # payment_mode = request.data['payment_mode'] ## frontend theke valu dile recive korbe na dile error dibe
+            
+            # if 'payment_mode' in requestdata:
+            #     payment_mode = request.data.get('payment_mode')
+            # else :
+            #     payment_mode = CHOICE.PAYMENT_MODE[0][0]
+
             product_costs = request.data.get('product_cost')
             grand_totals = request.data.get('grand_total')
-            # total_profits = request.data.get('total_profit')
             discounts = request.data.get('discount')
 
             product_cost = 0
@@ -285,7 +293,6 @@ def addorderitems(request):
 
                             # userid = request.user.id
                             # extra_fields = {}
-            
             prepare_data={}
             if product_cost == product_costs:
                 if grand_total == grand_totals:

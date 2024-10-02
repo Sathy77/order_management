@@ -14,14 +14,14 @@ class Registerserializer(serializers.ModelSerializer):
     super_user = serializers.BooleanField(default=False)
     class Meta:
         model = models.User
-        fields = ['id', 'username', 'email', 'password', 'is_active', 'is_staff', 'super_user']
+        fields = ['id', 'username', 'email', 'password', 'is_active', 'is_staff', 'super_user', 'user_type']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         if validated_data.get('super_user', False):
-            user = models.User.objects.create_superuser(username=validated_data['username'], email=validated_data['email'], password=validated_data['password'], is_active=True, is_staff=True)
+            user = models.User.objects.create_superuser(username=validated_data['username'], email=validated_data['email'], password=validated_data['password'], is_active=True, is_staff=True, user_type='Admin')
         else:
-            user = models.User.objects.create_user(username=validated_data['username'], email=validated_data['email'], password=validated_data['password'])
+            user = models.User.objects.create_user(username=validated_data['username'], email=validated_data['email'], password=validated_data['password'], user_type='Admin')
         # user.set_password(validated_data['password'])
         # user.save()
         return user
