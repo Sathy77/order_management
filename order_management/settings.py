@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'product.apps.ProductConfig',
     'zone.apps.ZoneConfig',
     'order.apps.OrderConfig',
+    'account.apps.AccountConfig',
     # 'department.apps.DepartmentConfig',
     # 'facility.apps.FacilityConfig',
     # 'attendance.apps.AttendanceConfig',
