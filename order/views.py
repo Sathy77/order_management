@@ -8,6 +8,7 @@ from order.serializer.GET import serializers as GET_SRLZER_ORDE
 from order.serializer.POST import serializers as POST_SRLZER_ORDE
 # from payroll.serializer.POST import serializers as PSRLZER_PAYR
 from user.serializer.POST import serializers as POST_SRLZER_USER
+from product.serializer.POST import serializers as POST_SRLZER_PROD
 from django.contrib.auth.hashers import make_password
 from helps.common.generic import Generichelps as ghelp
 from helps.choice import common as CHOICE
@@ -201,10 +202,9 @@ def addorderitems(request):
     response_status = status.HTTP_400_BAD_REQUEST
     requestdata = request.data.copy()
     userid = request.user.id
-
+    free_delivery = True
     contact_no = request.data.get('contact_no')
     if contact_no:
-
         delevaryzoneid = requestdata.get('deliveryzone')
         deliverycost = 0
         if delevaryzoneid:
@@ -212,6 +212,7 @@ def addorderitems(request):
             if delevaryzone.exists():
                 if not requestdata.get('free_delivery'):
                     deliverycost = delevaryzone.first().cost if delevaryzone.first().cost else 0
+                    free_delivery = False
                 
                 todate = date.today()
                 payment_mode = requestdata.get('payment_mode') ## frontend theke valu dile recive korbe na dile none pathabe
@@ -226,6 +227,7 @@ def addorderitems(request):
                 try: discounts += 0
                 except: response_message.append('discounts should be type of float!')
 
+                ##create customer
                 if not response_message:
                     response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
                     if not response['message']:
@@ -258,7 +260,9 @@ def addorderitems(request):
                             if grand_total != grand_totals: response_message.append(f'calculated grand_total is not matching, calculated({grand_total}) != provided({grand_totals})')
                             if discount != discounts: response_message.append(f'calculated discount is not matching, calculated({discount}) != provided({discounts})')
                             
+                            ##create ordersummary
                             if not response_message:
+                                #invoice auto create
                                 orderitems = MODELS_ORDE.Orderitems.objects.all().order_by('id').last()
                                 inv_first_serial = 100000
                                 inv_current_serial = inv_first_serial + orderitems.id if orderitems else inv_first_serial + 1
@@ -271,6 +275,7 @@ def addorderitems(request):
                                     'deliveryzone': delevaryzoneid,
                                     'product_cost': product_cost,
                                     'delivery_cost': deliverycost,
+                                    'free_delivery': free_delivery,
                                     'grand_total': grand_total,
                                     'total_profit': total_profit,
                                     'discount': discount,
@@ -284,6 +289,7 @@ def addorderitems(request):
                                     data=prepare_data, 
                                     required_fields=required_fields
                                 )
+                                #create orderitems and update product quantity
                                 if responsesuccessflag == 'success':
                                     for productkey in response['products'].keys():
                                         product = response['products'][productkey]['product']
@@ -294,10 +300,21 @@ def addorderitems(request):
                                             'unit_trade_price': product.first().costprice,
                                             'unit_mrp': product.first().mrpprice
                                         }
+                                        #create orderitems
                                         ghelp().addtocolass(classOBJ=MODELS_ORDE.Orderitems, Serializer=POST_SRLZER_ORDE.Orderitemsserializer, data=prepare_data)
                                         response_successflag = responsesuccessflag
                                         response_data = responsedata.data
                                         response_status = responsestatus
+
+                                        #Update product quantity
+                                        if responsesuccessflag == 'success':
+                                            order_quantity = response['products'][productkey]['quantity']
+                                            product = MODELS_PROD.Product.objects.filter(id=productkey)
+                                            quantity = product.first().quntity
+                                            quantity -= order_quantity
+                                            prepare_data={'quntity': quantity}
+                                            ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productkey,data=prepare_data)
+
                                 elif responsesuccessflag == 'error': response_message.extend(responsemessage)
                     else: response_message.extend(response['message'])
             else: response_message.append('delivary zone id is invalid!')
@@ -308,7 +325,43 @@ def addorderitems(request):
 
 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+# @deco.get_permission(['Get Permission list Details', 'all'])
+def updateordersummarystatus(request, ordersummaryid=None):
+    response_data = {}
+    response_message = []
+    response_successflag = 'error'
+    response_status = status.HTTP_400_BAD_REQUEST
+    requestdata = request.data.copy()
+    order_status = requestdata.get('order_status')
+    if order_status:
+        freez_update = [{'order_status': [CHOICE.ORDER_STATUS[3][1], CHOICE.ORDER_STATUS[4][1], CHOICE.ORDER_STATUS[5][1]]}]
+        response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+            classOBJ=MODELS_ORDE.Ordersummary, 
+            Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
+            id=ordersummaryid, 
+            data = {'order_status': order_status},
+            freez_update = freez_update
+        )
+        # Ensure that response_data is serialized
+        if isinstance(response_data, POST_SRLZER_ORDE.Ordersummaryserializer):
+            response_data = response_data.data  # Access the .data attribute
+        
+        if response_successflag == "success" and (order_status == "Cancelled" or order_status == "Returned" ):
+            orderitems = MODELS_ORDE.Orderitems.objects.filter(ordersummary=ordersummaryid)
+            for orderitem in orderitems:
+                product = orderitem.product
+                productid = product.id
+                order_quantity = orderitem.order_quantity
+                product = MODELS_PROD.Product.objects.filter(id=productid)
+                quantity = product.first().quntity
+                quantity += order_quantity
+                prepare_data={'quntity': quantity}
+                ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productid,data=prepare_data)
 
+    else: response_message.append('order_status is required!')
+    return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 
 

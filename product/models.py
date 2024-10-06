@@ -17,7 +17,7 @@ class Product(Basic):
     photo = models.ImageField(upload_to=upload_product_photo, blank=True, null=True)
     gallery = models.CharField(max_length=200, blank=True, null=True)
     weight = models.CharField(max_length=200, blank=True, null=True)
-    quntity =  models.IntegerField(validators=[MinValueValidator(0)], default=1)
+    quntity =  models.IntegerField(validators=[MinValueValidator(0)], default=0)
     costprice = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
     mrpprice = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
