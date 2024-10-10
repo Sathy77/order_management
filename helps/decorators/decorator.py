@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from user import models as MODEL_USER
 from rest_framework.response import Response
 from helps.common.generic import Generichelps as ghelp
 from rest_framework import status
@@ -14,7 +14,7 @@ class CommonDecorator:
         permissions = []
         def decorator(func):
             def wrapper_func(request, *args, **kwargs):
-                ghelp().getPermissionsList(User=User, username=request.user.username, permissions=permissions, active=True)
+                ghelp().getPermissionsList(User=MODEL_USER.User, username=request.user.username, permissions=permissions, active=True)
                 if permissions:
                     if any(permission in lower_case_users for permission in permissions):
                         return func(request, *args, **kwargs)

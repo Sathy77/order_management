@@ -3,4 +3,6 @@ from user import models
 
 admin.site.register([
     models.User,
+    models.Permission,
+    models.Role
 ])

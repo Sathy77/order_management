@@ -74,25 +74,6 @@ class Generichelps(Minihelps):
         total_profit = product_cost - trade_cost
         return product_cost, grand_total, total_profit
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def getPermissionsList(self, User, username, permissions, all=False, active=False, inactive=False):
         if all + active + inactive == 1:
             user = User.objects.filter(username=username)
@@ -129,6 +110,92 @@ class Generichelps(Minihelps):
             if carrierList: preparedData.append(carrierList)
 
         return preparedData[0] if preparedData else None
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     def preparesalaryAndLeaves(self, salaryAndLeaves): # New
         if salaryAndLeaves:

@@ -284,9 +284,9 @@ def addorderitems(request):
                                 
                                 required_fields = ['deliveryzone']
                                 responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().addtocolass(
-                                    classOBJ=MODELS_ORDE.Ordersummary, 
-                                    Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
-                                    data=prepare_data, 
+                                    classOBJ=MODELS_ORDE.Ordersummary,
+                                    Serializer=POST_SRLZER_ORDE.Ordersummaryserializer,
+                                    data=prepare_data,
                                     required_fields=required_fields
                                 )
                                 #create orderitems and update product quantity
@@ -338,9 +338,9 @@ def updateordersummarystatus(request, ordersummaryid=None):
     if order_status:
         freez_update = [{'order_status': [CHOICE.ORDER_STATUS[3][1], CHOICE.ORDER_STATUS[4][1], CHOICE.ORDER_STATUS[5][1]]}]
         response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
-            classOBJ=MODELS_ORDE.Ordersummary, 
-            Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
-            id=ordersummaryid, 
+            classOBJ=MODELS_ORDE.Ordersummary,
+            Serializer=POST_SRLZER_ORDE.Ordersummaryserializer,
+            id=ordersummaryid,
             data = {'order_status': order_status},
             freez_update = freez_update
         )

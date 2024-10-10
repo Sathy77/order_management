@@ -34,7 +34,7 @@ class Transectionincome(Basic):
     amount = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
     def __str__(self):
-        return f'{self.id} - {self.date}' 
+        return f'{self.id} - {self.date}'
     
 class Transectionexpense(Basic):
     expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='transectionexpense_expense')

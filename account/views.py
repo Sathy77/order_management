@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
+from helps.decorators.decorator import CommonDecorator as deco
 from account import models as MODELS_ACCO
 from account.serializer.GET import serializers as GET_SRLZER_ACCO
 from account.serializer.POST import serializers as POST_SRLZER_ACCO
@@ -40,13 +41,13 @@ def getincomes(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['get company info', 'all'])
+@deco.get_permission(['add income'])
 def addincome(request):
     requestdata = request.data.copy()
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
-    required_fields = ['title']
+    required_fields = ['title', 'balance']
     # fields_regex = [{'field': 'date', 'type': 'date'}, {'field': 'in_time', 'type': 'time'}, {'field': 'out_time', 'type': 'time'}]
     response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
         classOBJ=MODELS_ACCO.Income, 
@@ -116,13 +117,13 @@ def getexpenses(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['get company info', 'all'])
+# @deco.get_permission(['Account'])
 def addexpense(request):
     requestdata = request.data.copy()
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
-    required_fields = ['title']
+    required_fields = ['title', 'balance']
     # fields_regex = [{'field': 'date', 'type': 'date'}, {'field': 'in_time', 'type': 'time'}, {'field': 'out_time', 'type': 'time'}]
     response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
         classOBJ=MODELS_ACCO.Expense, 
@@ -165,7 +166,7 @@ def deleteexpense(request, expenseid=None):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['get company info', 'all'])
+# @deco.get_permission(['coco'])
 def addtransectionincome(request):
     response_data = {}
     response_message = []

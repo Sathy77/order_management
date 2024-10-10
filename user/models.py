@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from helps.abstract.abstractclass import Basic
 from datetime import timedelta
 from helps.choice import common as CHOICE
 from helps.common.generic import Generichelps as ghelp
@@ -8,10 +9,32 @@ from helps.common.generic import Generichelps as ghelp
 def generate_unique_code():
     return ghelp().getUniqueCodePattern()
 
+class Permission(Basic):
+    name = models.CharField(max_length=50, unique=True)
+    # code  = models.CharField(max_length=15, default=generate_code, unique=True, editable=False)
+    # active = models.BooleanField(default=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.id} - {self.name}'
+    
+class Role(Basic):
+    name = models.CharField(max_length=50, blank=True, null=True)
+    permission = models.ManyToManyField(Permission, blank=True)
+    # active = models.BooleanField(default=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.id} - {self.name}'
+
 class User(AbstractUser):
     name = models.CharField(max_length=150, blank=True, null=True)
     address = models.CharField(max_length=250, blank=True, null=True)
     contact_no = models.CharField(max_length=14, unique=True, blank=True, null=True)
+
+    role = models.ManyToManyField(Role, blank=True)
 
     uniqueid = models.CharField(max_length=18, unique=True, default=generate_unique_code)
     # uniqueid = models.CharField(max_length=18, unique=True)
