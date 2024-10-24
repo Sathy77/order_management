@@ -12,30 +12,25 @@ from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 # @deco.get_permission(['Get Single Permission Details', 'all'])
-def getdeliveryzones(request):
+def getdeliveryzones_noauth(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
         {'name': 'name', 'convert': None, 'replace':'name__icontains'},
         {'name': 'cost', 'convert': None, 'replace':'cost'}
     ]
+
     deliveryzones = MODELS_ZONE.Deliveryzone.objects.filter(**ghelp().KWARGS(request, filter_fields))
 
-    column_accessor = request.GET.get('column_accessor')
-    if column_accessor: deliveryzones = deliveryzones.order_by(column_accessor)
-    
-    total_count = deliveryzones.count()
-    page = int(request.GET.get('page')) if request.GET.get('page') else 1
-    page_size = int(request.GET.get('page_size')) if request.GET.get('page_size') else 10
-    if page and page_size: deliveryzones=deliveryzones[(page-1)*page_size:page*page_size]
+    deliveryzones, total_count, page, page_size = ghelp().getPaginatedData(request, deliveryzones)
 
     deliveryzoneserializers = GET_SRLZER_ZONE.Deliveryzoneserializer(deliveryzones, many=True)
     return Response({'data': {
         'count': total_count,
         'page': page,
         'page_size': page_size,
-        'result': deliveryzoneserializers.data
+        'results': deliveryzoneserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -85,3 +80,25 @@ def deletedeliveryzone(request, deliveryzoneid=None):
         id=deliveryzoneid,
     )
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+# @deco.get_permission(['Get Single Permission Details', 'all'])
+def getdeliveryzones_auth(request):
+    filter_fields = [
+        {'name': 'id', 'convert': None, 'replace':'id'},
+        {'name': 'name', 'convert': None, 'replace':'name__icontains'},
+        {'name': 'cost', 'convert': None, 'replace':'cost'}
+    ]
+
+    deliveryzones = MODELS_ZONE.Deliveryzone.objects.filter(**ghelp().KWARGS(request, filter_fields))
+
+    deliveryzones, total_count, page, page_size = ghelp().getPaginatedData(request, deliveryzones)
+
+    deliveryzoneserializers = GET_SRLZER_ZONE.Deliveryzoneserializer(deliveryzones, many=True)
+    return Response({'data': {
+        'count': total_count,
+        'page': page,
+        'page_size': page_size,
+        'results': deliveryzoneserializers.data
+    }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)

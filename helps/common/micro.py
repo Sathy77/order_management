@@ -41,11 +41,11 @@ class Microhelps(Nanohelps):
                     preparedata = {}
                     self.filterAllowedFields(allowed_fields, data, preparedata)
                     self.filterUniqueFields(classOBJ, unique_fields, preparedata, response_message)
-                    preparedata.update(extra_fields)
                     self.filterChoiceFields(choice_fields, preparedata, response_message)
                     self.filterRequiredFields(required_fields, preparedata, response_message)
                     self.filterRegexFields(fields_regex, preparedata, response_message)
                     if not response_message:
+                        if extra_fields: preparedata.update(extra_fields)
                         serializer = Serializer(data=preparedata, many=False)
                         if serializer.is_valid():
                             try:    
@@ -84,12 +84,12 @@ class Microhelps(Nanohelps):
                             preparedata = {}
                             self.filterAllowedFields(allowed_fields, data, preparedata)
                             self.filterUniqueFields(classOBJ, unique_fields, preparedata, response_message, recordid=classobj.first().id)
-                            if extra_fields: preparedata.update(extra_fields)
                             self.filterFreezFields(classobj, freez_update, response_message)
                             self.filterContinueFields(classobj, continue_update, response_message)
                             self.filterChoiceFields(choice_fields, preparedata, response_message)
                             self.filterRegexFields(fields_regex, preparedata, response_message)
                             if not response_message:
+                                if extra_fields: preparedata.update(extra_fields)
                                 serializer = Serializer(instance=classobj.first(), data=preparedata, partial=True)
                                 if serializer.is_valid():
                                     try:

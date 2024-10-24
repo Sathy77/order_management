@@ -68,11 +68,39 @@ class Generichelps(Minihelps):
 
             product_cost +=  unit_mrp*order_quantity
             trade_cost += unit_trade_price*order_quantity
-        product_cost -= discount
+        # product_cost -= discount
         
         grand_total = product_cost + deliverycost
-        total_profit = product_cost - trade_cost
+        grand_total -= discount
+        total_profit = (product_cost - discount) - trade_cost
         return product_cost, grand_total, total_profit
+    
+    def calculateProductCalculationauth(self, products, discount, is_fiexd_amounts, deliverycost):
+        product_cost = 0
+        trade_cost = 0
+
+        for productkey in products.keys():
+            product = products[productkey]['product']
+            order_quantity = products[productkey]['quantity']
+
+            unit_trade_price = product.first().costprice
+            unit_mrp = product.first().mrpprice
+
+            product_cost +=  unit_mrp*order_quantity
+            trade_cost += unit_trade_price*order_quantity
+        
+        if is_fiexd_amounts:
+            discount_total = discount
+            # product_cost -= discount_total
+                   
+        else:
+            discount_total = product_cost * discount/100
+            # product_cost -= discount_total
+
+        grand_total = product_cost + deliverycost
+        grand_total -= discount_total
+        total_profit = (product_cost -discount_total) - trade_cost
+        return product_cost, grand_total, total_profit, discount_total
 
     def getPermissionsList(self, User, username, permissions, all=False, active=False, inactive=False):
         if all + active + inactive == 1:
@@ -97,6 +125,7 @@ class Generichelps(Minihelps):
         preparedData = []
 
         if fieldsname == 'product': fields = self.getProductData()
+        if fieldsname == 'setting': fields = self.getSettingData()
         
 
         if isinstance(objects, dict):

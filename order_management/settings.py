@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'zone.apps.ZoneConfig',
     'order.apps.OrderConfig',
     'account.apps.AccountConfig',
+    'om_settings.apps.OmSettingsConfig'
     # 'department.apps.DepartmentConfig',
     # 'facility.apps.FacilityConfig',
     # 'attendance.apps.AttendanceConfig',
@@ -107,6 +108,7 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -144,8 +146,6 @@ CORS_ALLOWED_ORIGINS = [
     'http://10.10.22.220:3004',
     'http://10.10.23.89:5000',
     'http://10.10.23.16:5000',
-    'http://10.10.23.16:7000',
-    'http://10.10.23.89:7000',
     'http://10.10.20.20:49012',
     'http://113.212.109.147:49012',
     'http://10.10.23.89:49012',
@@ -156,6 +156,12 @@ CORS_ALLOWED_ORIGINS = [
     'http://10.10.20.20:49015',
     'http://10.10.20.20:49016',
     'http://10.10.20.81:8000',
+
+
+
+
+    'http://10.10.23.16:7000',
+    'http://10.10.23.89:7000',
     'http://*',
 ]   
 

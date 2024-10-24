@@ -113,6 +113,24 @@ class Picohelps:
                kwargs.update({field['replace']: field_value})
       return kwargs
    
+   # def SEARCH_TERM(self, request, filter_fields):
+   #    kwargs = {}
+   #    search_term=request.GET.get('search_term')
+   #    if search_term != None:
+   #       field_value=request.GET.get(search_term)
+   #       if field_value != None:
+   #          for field in filter_fields:
+   #             if search_term == field['name']:
+   #                if field['convert'] == 'bool':
+   #                   if field_value in ['TRUE', 'True', 'true', '1']: field_value = True
+   #                   else: field_value = False
+   #                if field['convert'] == 'list-str':
+   #                   if 'split' in field_value:
+   #                      splitsign = field_value['split']
+   #                      field_value = field_value.split(splitsign)
+   #                kwargs.update({field['replace']: field_value})
+   #    return kwargs
+   
 
    def findGeneralsettings(self, Generalsettings): # New
       generalsetting = Generalsettings.objects.all()
@@ -220,6 +238,30 @@ class Picohelps:
                ]
             }
    
+   def getSettingData(self):
+      return {
+               'fieldlist': [
+                  {'field': 'company_name', 'type': 'str'},
+                  {'field': 'logo', 'type': 'str'},
+                  {'field': 'address', 'type': 'str'},
+                  {'field': 'phone_number', 'type': 'str'},
+                  {'field': 'email', 'type': 'str'},
+
+                  {'field': 'vat_no', 'type': 'str'},
+                  {'field': 'business_identification_number', 'type': 'str'},
+                  {'field': 'bsti_registration_number', 'type': 'str'},
+                  {'field': 'iso_certification_number', 'type': 'str'},
+
+                  {'field': 'website_url', 'type': 'str'},
+                  {'field': 'facebook_url', 'type': 'str'},
+                  {'field': 'instagram_url', 'type': 'str'},
+                  {'field': 'whatsapp_url', 'type': 'str'},
+                  {'field': 'tiktok_url', 'type': 'str'},
+                  {'field': 'x_url', 'type': 'str'},
+                  {'field': 'youtube_url', 'type': 'str'},
+               ]
+            }
+   
    
    def removeFile(self, OBJ, key):
       photo = getattr(OBJ, key, None)
@@ -227,3 +269,27 @@ class Picohelps:
          if photo.path:
                if os.path.exists(photo.path):
                   os.remove(photo.path)
+
+   def getPaginatedData(self, request, records):
+      total_count = records.count()
+      page = 1
+      page_size = total_count
+      
+
+      column_accessor = request.GET.get('column_accessor')
+      if column_accessor: records = records.order_by(column_accessor)
+
+      if request.GET.get('records') != 'all':
+         page = request.GET.get('page')
+         if page:
+            if page.isnumeric(): page = int(page)
+            else: page = 1
+         else: page = 1
+         page_size = request.GET.get('page_size')
+         if page_size:
+            if page_size.isnumeric(): page_size = int(page_size)
+            else: page_size = 10
+         else: page_size = 10
+         
+         if page and page_size: records = records[(page-1)*page_size:page*page_size]
+      return records, total_count, page, page_size

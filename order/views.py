@@ -25,8 +25,17 @@ from rest_framework import status
 def getordersummary(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
-        {'name': 'user', 'convert': None, 'replace':'user'},
-        {'name': 'date', 'convert': None, 'replace':'date'},
+        {'name': 'customer', 'convert': None, 'replace':'user'},
+        {'name': 'name', 'convert': None, 'replace':'user__name__icontains'},  ##nested search
+        {'name': 'contact_no', 'convert': None, 'replace':'user__contact_no__icontains'}, ##nested search
+        {'name': 'email', 'convert': None, 'replace':'user__email__icontains'}, ##nested search
+        {'name': 'product_name', 'convert': None, 'replace':'orderitems_ordersummary__product__name__icontains'}, ##reverse nested search
+        
+        #date range
+        {'name': 'date_from', 'convert': None, 'replace':'date__gte'},
+        {'name': 'date_to', 'convert': None, 'replace':'date__lte'},
+
+
         {'name': 'invoice_no', 'convert': None, 'replace':'invoice_no'},
         {'name': 'deliveryzone', 'convert': None, 'replace':'deliveryzone'},
         {'name': 'payment_mode', 'convert': None, 'replace':'payment_mode'},
@@ -37,24 +46,19 @@ def getordersummary(request):
         {'name': 'free_delivery', 'convert': 'bool', 'replace':'free_delivery'},
         {'name': 'grand_total', 'convert': None, 'replace':'grand_total'},
         {'name': 'total_profit', 'convert': None, 'replace':'total_profit'},
-        {'name': 'order_status', 'convert': None, 'replace':'order_status'}
+        {'name': 'order_status', 'convert': None, 'replace':'order_status'},
+        {'name': 'payment_status', 'convert': None, 'replace':'payment_status'},
     ]
     ordersummarys = MODELS_ORDE.Ordersummary.objects.filter(**ghelp().KWARGS(request, filter_fields))
 
-    column_accessor = request.GET.get('column_accessor')
-    if column_accessor: ordersummarys = ordersummarys.order_by(column_accessor)
-    
-    total_count = ordersummarys.count()
-    page = int(request.GET.get('page')) if request.GET.get('page') else 1
-    page_size = int(request.GET.get('page_size')) if request.GET.get('page_size') else 10
-    if page and page_size: ordersummarys=ordersummarys[(page-1)*page_size:page*page_size]
+    ordersummarys, total_count, page, page_size = ghelp().getPaginatedData(request, ordersummarys)
 
     ordersummaryserializers = GET_SRLZER_ORDE.Ordersummaryserializer(ordersummarys, many=True)
     return Response({'data': {
         'count': total_count,
         'page': page,
         'page_size': page_size,
-        'result': ordersummaryserializers.data
+        'results': ordersummaryserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -71,20 +75,14 @@ def getorderitems(request):
     ]
     orderitems = MODELS_ORDE.Orderitems.objects.filter(**ghelp().KWARGS(request, filter_fields))
 
-    column_accessor = request.GET.get('column_accessor')
-    if column_accessor: orderitems = orderitems.order_by(column_accessor)
-    
-    total_count = orderitems.count()
-    page = int(request.GET.get('page')) if request.GET.get('page') else 1
-    page_size = int(request.GET.get('page_size')) if request.GET.get('page_size') else 10
-    if page and page_size: orderitems=orderitems[(page-1)*page_size:page*page_size]
+    orderitems, total_count, page, page_size = ghelp().getPaginatedData(request, orderitems)
 
     orderitemsserializers = GET_SRLZER_ORDE.Orderitemsserializer(orderitems, many=True)
     return Response({'data': {
         'count': total_count,
         'page': page,
         'page_size': page_size,
-        'result': orderitemsserializers.data
+        'results': orderitemsserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
 
@@ -193,9 +191,9 @@ def getorderitems(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 # @deco.get_permission(['get company info', 'all'])
-def addorderitems(request):
+def addorderitems_noauth(request):
     response_data = {}
     response_message = []
     response_successflag = 'error'
@@ -216,6 +214,8 @@ def addorderitems(request):
                 
                 todate = date.today()
                 payment_mode = requestdata.get('payment_mode') ## frontend theke valu dile recive korbe na dile none pathabe
+                if not payment_mode:
+                    payment_mode = CHOICE.PAYMENT_MODE[0][0]
                 
                 product_costs = requestdata.get('product_cost')
                 try: product_costs += 0
@@ -225,7 +225,8 @@ def addorderitems(request):
                 except: response_message.append('grand_totals should be type of float!')
                 discounts = requestdata.get('discount')
                 try: discounts += 0
-                except: response_message.append('discounts should be type of float!')
+                except: discounts = 0
+                    # response_message.append('discounts should be type of float!')
 
                 ##create customer
                 if not response_message:
@@ -233,12 +234,12 @@ def addorderitems(request):
                     if not response['message']:
                         user = MODELS_USER.User.objects.filter(contact_no=contact_no) 
                         if not user.exists():
-                            allowed_fields = ['name', 'address', 'contact_no']
+                            allowed_fields = ['name', 'address', 'contact_no', 'email']
                             extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'created_by': userid, 'updated_by': userid}
                             required_fields = ['name', 'address', 'contact_no']
                             fields_regex = [{'field': 'contact_no', 'type': 'phonenumber'}]
                             unique_fields=['contact_no']
-                            responsedata, responsemessage, responsesuccessflag, _ = ghelp().addtocolass(
+                            responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().addtocolass(
                                 classOBJ=MODELS_USER.User,
                                 Serializer=POST_SRLZER_USER.Userserializer,
                                 data=requestdata,
@@ -250,16 +251,34 @@ def addorderitems(request):
                             )
                             if responsesuccessflag == 'success': user = responsedata.instance
                             elif responsesuccessflag == 'error': response_message.extend(responsemessage)
-                        else: user = user.first()
-
+                        else: 
+                            user = user.first()
+                            # userid = request.user.id
+                            extra_fields = {}
+                            if userid: extra_fields.update({'updated_by': userid})
+                            allowed_fields=['name', 'address', 'contact_no', 'email']
+                            # freez_update = [{'user_type': 'Admin'}]  //user type admin paile purai r update korte dibe na
+                            responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().updaterecord(
+                                classOBJ=MODELS_USER.User, 
+                                Serializer=POST_SRLZER_USER.Userserializer, 
+                                id=user.id,
+                                data=request.data,
+                                allowed_fields = allowed_fields,
+                                unique_fields=['contact_no'],
+                                # freez_update=freez_update,
+                                extra_fields=extra_fields
+                            )
+                            if responsesuccessflag == 'success': user = responsedata.instance
+                            elif responsesuccessflag == 'error': response_message.extend(responsemessage)
+                           
                         if not response_message:
                             discount = 0
                             product_cost, grand_total, total_profit = ghelp().calculateProductCalculation(response['products'], discount, deliverycost)
-
                             if product_cost != product_costs: response_message.append(f'total calculated product_cost is not matching, calculated({product_cost}) != provided({product_costs})')
                             if grand_total != grand_totals: response_message.append(f'calculated grand_total is not matching, calculated({grand_total}) != provided({grand_totals})')
                             if discount != discounts: response_message.append(f'calculated discount is not matching, calculated({discount}) != provided({discounts})')
                             
+
                             ##create ordersummary
                             if not response_message:
                                 #invoice auto create
@@ -280,8 +299,7 @@ def addorderitems(request):
                                     'total_profit': total_profit,
                                     'discount': discount,
                                     'payment_mode': payment_mode
-                                }
-                                
+                                } 
                                 required_fields = ['deliveryzone']
                                 responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().addtocolass(
                                     classOBJ=MODELS_ORDE.Ordersummary,
@@ -289,6 +307,7 @@ def addorderitems(request):
                                     data=prepare_data,
                                     required_fields=required_fields
                                 )
+                                
                                 #create orderitems and update product quantity
                                 if responsesuccessflag == 'success':
                                     for productkey in response['products'].keys():
@@ -305,7 +324,6 @@ def addorderitems(request):
                                         response_successflag = responsesuccessflag
                                         response_data = responsedata.data
                                         response_status = responsestatus
-
                                         #Update product quantity
                                         if responsesuccessflag == 'success':
                                             order_quantity = response['products'][productkey]['quantity']
@@ -314,7 +332,7 @@ def addorderitems(request):
                                             quantity -= order_quantity
                                             prepare_data={'quntity': quantity}
                                             ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productkey,data=prepare_data)
-
+           
                                 elif responsesuccessflag == 'error': response_message.extend(responsemessage)
                     else: response_message.extend(response['message'])
             else: response_message.append('delivary zone id is invalid!')
@@ -335,30 +353,43 @@ def updateordersummarystatus(request, ordersummaryid=None):
     response_status = status.HTTP_400_BAD_REQUEST
     requestdata = request.data.copy()
     order_status = requestdata.get('order_status')
+    payment_status = requestdata.get('payment_status')
     if order_status:
-        freez_update = [{'order_status': [CHOICE.ORDER_STATUS[3][1], CHOICE.ORDER_STATUS[4][1], CHOICE.ORDER_STATUS[5][1]]}]
-        response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
-            classOBJ=MODELS_ORDE.Ordersummary,
-            Serializer=POST_SRLZER_ORDE.Ordersummaryserializer,
-            id=ordersummaryid,
-            data = {'order_status': order_status},
-            freez_update = freez_update
-        )
-        # Ensure that response_data is serialized
-        if isinstance(response_data, POST_SRLZER_ORDE.Ordersummaryserializer):
-            response_data = response_data.data  # Access the .data attribute
-        
-        if response_successflag == "success" and (order_status == "Cancelled" or order_status == "Returned" ):
-            orderitems = MODELS_ORDE.Orderitems.objects.filter(ordersummary=ordersummaryid)
-            for orderitem in orderitems:
-                product = orderitem.product
-                productid = product.id
-                order_quantity = orderitem.order_quantity
-                product = MODELS_PROD.Product.objects.filter(id=productid)
-                quantity = product.first().quntity
-                quantity += order_quantity
-                prepare_data={'quntity': quantity}
-                ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productid,data=prepare_data)
+        if payment_status:
+            if payment_status == CHOICE.PAYMENT_STATUS[0][1] or payment_status == CHOICE.PAYMENT_STATUS[1][1]:
+                if order_status == CHOICE.ORDER_STATUS[3][1]:
+                    response_message.append('payment status ({payment_status})! your are not able to update order status ({order_status}) ')
+                    print(response_message)
+        else:
+            payment_status = CHOICE.PAYMENT_STATUS[0][1]
+            if order_status == CHOICE.ORDER_STATUS[3][1]:
+                response_message.append('payment status ({payment_status})! your are not able to update order status ({order_status}) ')
+
+        if not response_message :
+            freez_update = [{'order_status': [CHOICE.ORDER_STATUS[3][1], CHOICE.ORDER_STATUS[4][1], CHOICE.ORDER_STATUS[5][1]]}, 
+                            {'payment_status': [CHOICE.PAYMENT_STATUS[1][1], CHOICE.PAYMENT_STATUS[2][1]]}]
+            response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+                classOBJ=MODELS_ORDE.Ordersummary,
+                Serializer=POST_SRLZER_ORDE.Ordersummaryserializer,
+                id=ordersummaryid,
+                data = {'order_status': order_status, 'payment_status': payment_status},
+                freez_update = freez_update
+            )
+            # Ensure that response_data is serialized
+            if isinstance(response_data, POST_SRLZER_ORDE.Ordersummaryserializer):
+                response_data = response_data.data  # Access the .data attribute
+            
+            if response_successflag == "success" and (order_status == "Cancelled" or order_status == "Returned" ):
+                orderitems = MODELS_ORDE.Orderitems.objects.filter(ordersummary=ordersummaryid)
+                for orderitem in orderitems:
+                    product = orderitem.product
+                    productid = product.id
+                    order_quantity = orderitem.order_quantity
+                    product = MODELS_PROD.Product.objects.filter(id=productid)
+                    quantity = product.first().quntity
+                    quantity += order_quantity
+                    prepare_data={'quntity': quantity}
+                    ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productid,data=prepare_data)
 
     else: response_message.append('order_status is required!')
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
@@ -367,6 +398,334 @@ def updateordersummarystatus(request, ordersummaryid=None):
 
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+# @deco.get_permission(['get company info', 'all'])
+def addorderitem_auth(request):
+    response_data = {}
+    response_message = []
+    response_successflag = 'error'
+    response_status = status.HTTP_400_BAD_REQUEST
+    requestdata = request.data.copy()
+    userid = request.user.id
+    free_delivery = True
+    customerid = request.data.get('customer')
+    if customerid:
+        delevaryzoneid = requestdata.get('deliveryzone')
+        deliverycost = 0
+        if delevaryzoneid:
+            delevaryzone = MODELS_ZONE.Deliveryzone.objects.filter(id=delevaryzoneid)
+            if delevaryzone.exists():
+                if not requestdata.get('free_delivery'):
+                    deliverycost = delevaryzone.first().cost if delevaryzone.first().cost else 0
+                    free_delivery = False
+                
+                todate = date.today()
+                payment_mode = requestdata.get('payment_mode') ## frontend theke valu dile recive korbe na dile none pathabe
+                if not payment_mode:
+                    payment_mode = CHOICE.PAYMENT_MODE[0][0]
+                
+                product_costs = requestdata.get('product_cost')
+                try: product_costs += 0
+                except: response_message.append('product_costs should be type of float!')
+                grand_totals = requestdata.get('grand_total')
+                try: grand_totals += 0
+                except: response_message.append('grand_totals should be type of float!')
+                discount_totals = requestdata.get('discount_total')
+                try: discount_totals += 0
+                except: response_message.append('discount_totals should be type of float!')
+                    # response_message.append('discounts should be type of float!')
+                discounts = requestdata.get('discount')
+                if discounts == None:
+                    discounts = 0
+                
+                is_fiexd_amounts = requestdata.get('is_fiexd_amount')
+
+                ##create customer
+                if not response_message:
+                    response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
+                    if not response['message']:
+                        user = MODELS_USER.User.objects.filter(id=customerid) 
+                        if user.exists():
+                            product_cost, grand_total, total_profit, discount_total = ghelp().calculateProductCalculationauth(response['products'], discounts, is_fiexd_amounts, deliverycost)
+                            if product_cost != product_costs: response_message.append(f'total calculated product_cost is not matching, calculated({product_cost}) != provided({product_costs})')
+                            if grand_total != grand_totals: response_message.append(f'calculated grand_total is not matching, calculated({grand_total}) != provided({grand_totals})')
+                            if discount_total != discount_totals: response_message.append(f'calculated discount is not matching, calculated({discount_total}) != provided({discount_totals})')
+                            
+
+                            ##create ordersummary
+                            if not response_message:
+                                #invoice auto create
+                                orderitems = MODELS_ORDE.Orderitems.objects.all().order_by('id').last()
+                                inv_first_serial = 100000
+                                inv_current_serial = inv_first_serial + orderitems.id if orderitems else inv_first_serial + 1
+                                invoice_no = f'INV{inv_current_serial}'
+
+                                prepare_data={
+                                    'user': customerid,
+                                    'date': todate,
+                                    'invoice_no': invoice_no,
+                                    'deliveryzone': delevaryzoneid,
+                                    'product_cost': product_cost,
+                                    'delivery_cost': deliverycost,
+                                    'free_delivery': free_delivery,
+                                    'grand_total': grand_total,
+                                    'total_profit': total_profit,
+                                    'discount': discount_total,
+                                    'payment_mode': payment_mode
+                                } 
+                                extra_fields = {}
+                                if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
+                                required_fields = ['deliveryzone']
+                                responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().addtocolass(
+                                    classOBJ=MODELS_ORDE.Ordersummary,
+                                    Serializer=POST_SRLZER_ORDE.Ordersummaryserializer,
+                                    data=prepare_data,
+                                    extra_fields=extra_fields,
+                                    required_fields=required_fields
+                                )
+                                
+                                #create orderitems and update product quantity
+                                if responsesuccessflag == 'success':
+                                    for productkey in response['products'].keys():
+                                        product = response['products'][productkey]['product']
+                                        prepare_data={
+                                            'ordersummary': responsedata.data['id'],
+                                            'product': productkey,
+                                            'order_quantity': response['products'][productkey]['quantity'],
+                                            'unit_trade_price': product.first().costprice,
+                                            'unit_mrp': product.first().mrpprice
+                                        }
+                                        #create orderitems
+                                        ghelp().addtocolass(classOBJ=MODELS_ORDE.Orderitems, Serializer=POST_SRLZER_ORDE.Orderitemsserializer, data=prepare_data)
+                                        response_successflag = responsesuccessflag
+                                        response_data = responsedata.data
+                                        response_status = responsestatus
+                                        #Update product quantity
+                                        if responsesuccessflag == 'success':
+                                            order_quantity = response['products'][productkey]['quantity']
+                                            product = MODELS_PROD.Product.objects.filter(id=productkey)
+                                            quantity = product.first().quntity
+                                            quantity -= order_quantity
+                                            prepare_data={'quntity': quantity}
+                                            ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productkey,data=prepare_data)
+           
+                                elif responsesuccessflag == 'error': response_message.extend(responsemessage)
+                        else: 
+                            response_message.append('user id is not invalid!')      
+                    else: response_message.extend(response['message'])
+            else: response_message.append('delivary zone id is invalid!')
+        else: response_message.append('delivary zone is required!')
+    else: response_message.append('please provide valid customer')
+    return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+# @deco.get_permission(['Get Permission list Details', 'all'])
+def updateorderitem_auth(request, ordersummaryid=None):
+    response_data = {}
+    response_message = []
+    response_successflag = 'error'
+    response_status = status.HTTP_400_BAD_REQUEST
+
+    requestdata = request.data.copy()
+    previous_orderitems = MODELS_ORDE.Orderitems.objects.filter(ordersummary_id=ordersummaryid)
+    new_orderitems = request.data.get('products')
+    
+    previous_products = []
+    new_products = []
+    # remove_products = []
+    # remove_orderitems = []
+    # update_products = []
+    # update_orderitems = []
+    # add_products = []
+
+    for product in previous_orderitems:
+        previous_products.append(product.product.id)
+    for product in new_orderitems:
+        new_products.append(product.get('id'))
+
+    customerid = requestdata.get('customer')
+    if customerid == None:
+        response_message.append('customer is required!')
+    free_delivery = True
+
+    delevaryzoneid = requestdata.get('deliveryzone')
+    deliverycost = 0
+    if delevaryzoneid:
+        delevaryzone = MODELS_ZONE.Deliveryzone.objects.filter(id=delevaryzoneid)
+        if delevaryzone.exists():
+            if not requestdata.get('free_delivery'):
+                deliverycost = delevaryzone.first().cost if delevaryzone.first().cost else 0
+                free_delivery = False
+            
+            todate = date.today()
+            coupons = requestdata.get('coupon')
+            try: coupons += 0
+            except: coupons = 0
+            payment_mode = requestdata.get('payment_mode') ## frontend theke valu dile recive korbe na dile none pathabe
+            if not payment_mode:
+                payment_mode = CHOICE.PAYMENT_MODE[0][0]
+            
+            product_costs = requestdata.get('product_cost')
+            try: product_costs += 0
+            except: response_message.append('product_costs should be type of float!')
+            grand_totals = requestdata.get('grand_total')
+            try: grand_totals += 0
+            except: response_message.append('grand_totals should be type of float!')
+            discount_totals = requestdata.get('discount_total')
+            try: discount_totals += 0
+            except: response_message.append('discount_totals should be type of float!')
+                # response_message.append('discounts should be type of float!')
+            discounts = requestdata.get('discount')
+            if discounts == None:
+                discounts = 0
+            
+            is_fiexd_amounts = requestdata.get('is_fiexd_amount')
+            
+            ##create customer
+            if not response_message:
+                
+                response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
+                if not response['message']:
+                    user = MODELS_USER.User.objects.filter(id=customerid) 
+                    if user.exists():
+                        
+                        product_cost, grand_total, total_profit, discount_total = ghelp().calculateProductCalculationauth(response['products'], discounts, is_fiexd_amounts, deliverycost)
+                        if product_cost != product_costs: response_message.append(f'total calculated product_cost is not matching, calculated({product_cost}) != provided({product_costs})')
+                        if grand_total != grand_totals: response_message.append(f'calculated grand_total is not matching, calculated({grand_total}) != provided({grand_totals})')
+                        if discount_total != discount_totals: response_message.append(f'calculated discount is not matching, calculated({discount_total}) != provided({discount_totals})')
+
+                        # print("product_cost", product_cost)
+                        # print("grand_total", grand_total)
+                        # print("discount_total", discount_total)
+
+                        #update order iteam or delete order iteam and update product quantity
+                        if not response_message:
+                            for productid in previous_products:
+                                previous_orderitem = previous_orderitems.filter(product_id=productid).first()
+
+                                #update order iteam or delete order iteam and update product quantity
+                                if productid in new_products:
+                                    for product in new_orderitems:
+                                        if product.get('id')==productid:
+                                            new_quantity = product.get('order_quantity')
+
+                                    previous_quantity = previous_orderitem.order_quantity
+                                    quantity = new_quantity - previous_quantity
+
+                                    # update_orderitems.append(previous_orderitem.id)
+                                    # update_products.append(productid)
+
+                                    product = MODELS_PROD.Product.objects.filter(id=productid).first()
+                                    order_item = previous_orderitem.id
+                                    prepare_data={
+                                                'product': productid,
+                                                'order_quantity': new_quantity,
+                                                'unit_trade_price': product.costprice,
+                                                'unit_mrp': product.mrpprice
+                                            }
+                                    allowed_fields=['product', 'order_quantity', 'unit_trade_price', 'unit_mrp']
+                                    response_data, response_message, responsesuccessflag, response_status = ghelp().updaterecord(
+                                        classOBJ=MODELS_ORDE.Orderitems, 
+                                        Serializer=POST_SRLZER_ORDE.Orderitemsserializer, 
+                                        id=previous_orderitem.id,
+                                        data=prepare_data,
+                                    )
+                                    response_data = response_data.data if response_successflag == 'success' else {}
+                                    if responsesuccessflag == 'success':
+                                        # order_quantity = quantity
+                                        product = MODELS_PROD.Product.objects.filter(id=productid)
+                                        product_quantity = product.first().quntity
+                                        product_quantity -= quantity
+                                        prepare_data={'quntity': product_quantity}
+                                        ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productid,data=prepare_data)
+
+                                #delete order iteam and update product quantity
+                                else:
+                                    # remove_orderitems.append(previous_orderitem.id)
+                                    removeid = previous_orderitem.id
+                                    # remove_products.append(productid)
+                                    orderitem = previous_orderitems.filter(id=removeid).first()
+                                    order_quantity = orderitem.order_quantity
+                                    responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().deleterecord(
+                                    classOBJ=MODELS_ORDE.Orderitems,
+                                    id=removeid,
+                                    )
+                                    if responsesuccessflag == 'success':               
+                                        product = MODELS_PROD.Product.objects.filter(id=productid).first()
+                                        quantity = product.quntity
+                                        quantity += order_quantity
+                                        prepare_data={'quntity': quantity}
+                                        responsedata, responsemessage, responsesuccessflag, responsestatus =ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productid, data=prepare_data)
+                            # print("previous_products", previous_products)
+                            # print("new_products", new_products)
+
+                            #add order iteam and update product quantity
+                            for productid in new_products:
+                                if productid not in previous_products:
+                                    # add_products.append(productid)
+                                    for product in new_orderitems:
+                                        if product.get('id')==productid:
+                                            quantity = product.get('order_quantity')
+                                            
+                                    product = MODELS_PROD.Product.objects.filter(id=productid)
+                                    prepare_data={
+                                        'ordersummary': ordersummaryid,
+                                        'product': productid,
+                                        'order_quantity': quantity,
+                                        'unit_trade_price': product.first().costprice,
+                                        'unit_mrp': product.first().mrpprice
+                                    }
+                                    #create orderitems
+                                    responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().addtocolass(classOBJ=MODELS_ORDE.Orderitems, Serializer=POST_SRLZER_ORDE.Orderitemsserializer, data=prepare_data)
+                                    response_successflag = responsesuccessflag
+                                    response_data = responsedata.data
+                                    response_status = responsestatus
+                                    #Update product quantity
+                                    if responsesuccessflag == 'success':
+                                        order_quantity = quantity
+                                        product = MODELS_PROD.Product.objects.filter(id=productid)
+                                        quantity = product.first().quntity
+                                        quantity -= order_quantity
+                                        prepare_data={'quntity': quantity}
+                                        ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productid,data=prepare_data)    
+
+                            ##update ordersummary        
+                            if not response_message:
+                                userid = request.user.id
+                                extra_fields = {}
+                                if userid: extra_fields.update({'updated_by': userid})
+                                prepare_data={
+                                    'user': customerid,
+                                    'deliveryzone': delevaryzoneid,
+                                    'product_cost': product_cost,
+                                    'delivery_cost': deliverycost,
+                                    'free_delivery': free_delivery,
+                                    'grand_total': grand_total,
+                                    'total_profit': total_profit,
+                                    'discount': discount_total,
+                                    'payment_mode': payment_mode,
+                                    'coupon' : coupons
+                                }
+                                allowed_fields=['user', 'deliveryzone', 'product_cost', 'delivery_cost', 'free_delivery', 'grand_total', 'total_profit', 'discount', 'payment_mode', 'coupon']
+                                response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+                                    classOBJ=MODELS_ORDE.Ordersummary, 
+                                    Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
+                                    id=ordersummaryid,
+                                    data=prepare_data,
+                                    extra_fields=extra_fields,
+                                    allowed_fields= allowed_fields
+                                )
+                                response_data = response_data.data if response_successflag == 'success' else {}
+                    else: response_message.append('user id is not invalid!')  
+                else: response_message.extend(response['message'])   
+        else: response_message.append('delivary zone id is invalid!')
+    else: response_message.append('delivary zone is required!')
+    # print("remove_products",remove_products, remove_orderitems)
+    # print("update_products",update_products, update_orderitems)
+    # print("add_products",add_products)
+    return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 
 ###আমার 

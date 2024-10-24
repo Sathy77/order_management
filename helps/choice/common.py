@@ -12,6 +12,11 @@ ORDER_STATUS = (
     ('Cancelled', 'Cancelled'), 
     ('Returned', 'Returned'), 
 )
+PAYMENT_STATUS = (
+    ('Pending','Pending'),
+    ('Partial Received', 'Partial Received'), 
+    ('Received', 'Received'),
+)
 BLOOD_GROUP = (
     ('A+', 'A+'),
     ('A-', 'A-'),

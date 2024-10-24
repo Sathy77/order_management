@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from order import models
-from user.serializer.GET import serializers as GET_SRLZER_USER
+from user.serializer.CUSTOM import serializers as CUSTOM_SRLZER_USER
 from zone.serializer.GET import serializers as GET_SRLZER_ZONE
 from product.serializer.GET import serializers as GET_SRLZER_PROD
 
 class Ordersummaryserializer(serializers.ModelSerializer):
-    user = GET_SRLZER_USER.Userserializer()
+    user = CUSTOM_SRLZER_USER.Userserializer()
     deliveryzone = GET_SRLZER_ZONE.Deliveryzoneserializer()
     class Meta:
         model = models.Ordersummary

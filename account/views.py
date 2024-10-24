@@ -22,26 +22,19 @@ def getincomes(request):
         {'name': 'balance', 'convert': None, 'replace':'balance'}
     ]
     incomes = MODELS_ACCO.Income.objects.filter(**ghelp().KWARGS(request, filter_fields))
-
-    column_accessor = request.GET.get('column_accessor')
-    if column_accessor: incomes = incomes.order_by(column_accessor)
     
-    total_count = incomes.count()
-    page = int(request.GET.get('page')) if request.GET.get('page') else 1
-    page_size = int(request.GET.get('page_size')) if request.GET.get('page_size') else 10
-    if page and page_size: incomes=incomes[(page-1)*page_size:page*page_size]
-
+    incomes, total_count, page, page_size = ghelp().getPaginatedData(request, incomes)
     incomeserializers = GET_SRLZER_ACCO.Incomeserializer(incomes, many=True)
     return Response({'data': {
         'count': total_count,
         'page': page,
         'page_size': page_size,
-        'result': incomeserializers.data
+        'results': incomeserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@deco.get_permission(['add income'])
+@deco.get_permission(['all'])
 def addincome(request):
     requestdata = request.data.copy()
     userid = request.user.id
@@ -99,20 +92,14 @@ def getexpenses(request):
     ]
     expenses = MODELS_ACCO.Expense.objects.filter(**ghelp().KWARGS(request, filter_fields))
 
-    column_accessor = request.GET.get('column_accessor')
-    if column_accessor: expenses = expenses.order_by(column_accessor)
-    
-    total_count = expenses.count()
-    page = int(request.GET.get('page')) if request.GET.get('page') else 1
-    page_size = int(request.GET.get('page_size')) if request.GET.get('page_size') else 10
-    if page and page_size: expenses=expenses[(page-1)*page_size:page*page_size]
+    expenses, total_count, page, page_size = ghelp().getPaginatedData(request, expenses)
 
     expenseserializers = GET_SRLZER_ACCO.Expenseserializer(expenses, many=True)
     return Response({'data': {
         'count': total_count,
         'page': page,
         'page_size': page_size,
-        'result': expenseserializers.data
+        'results': expenseserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
