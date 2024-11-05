@@ -12,10 +12,17 @@ class Expenseserializer(serializers.ModelSerializer):
         model = models.Expense
         fields = ['id', 'title', 'balance']
 
-class Transectionincomeserializer(serializers.ModelSerializer):
+class Transectionserializer(serializers.ModelSerializer):
     income = Incomeserializer()
+    expense = Expenseserializer()
     ordersummary = GET_SRLZER_ORDE.Ordersummaryserializer()
     class Meta:
-        model = models.Transectionincome
-        fields = ['id', 'income', 'ordersummary', 'reference', 'date', 'amount']
+        model = models.Transection
+        fields = ['id', 'income', 'expense', 'ordersummary', 'reference', 'date', 'amount']
 
+# class Transectionexpenseserializer(serializers.ModelSerializer):
+#     income = Incomeserializer()
+#     ordersummary = GET_SRLZER_ORDE.Ordersummaryserializer()
+#     class Meta:
+#         model = models.Transectionexpense
+#         fields = ['id', 'expense', 'ordersummary', 'reference', 'date', 'amount']

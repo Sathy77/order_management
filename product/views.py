@@ -9,12 +9,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from drf_nested_forms.utils import NestedForm
 from django.db.models import Q
+from helps.decorators.decorator import CommonDecorator as deco
 
 # Create your views here.
 
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Single Permission Details', 'all'])
 def getproducts_noauth(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -45,7 +45,7 @@ def getproducts_noauth(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['get company info', 'all'])
+# @deco.get_permission(['create_product'])
 def addproduct(request):
     requestdata = dict(request.data)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
@@ -70,7 +70,7 @@ def addproduct(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Permission list Details', 'all'])
+# @deco.get_permission(['edit_product'])
 def updateproduct(request, productid=None):
     requestdata = dict(request.data)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
@@ -97,7 +97,7 @@ def updateproduct(request, productid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Permission list Details', 'all'])
+# @deco.get_permission(['delete_product'])
 def deleteproduct(request, productid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_PROD.Product,
@@ -107,7 +107,7 @@ def deleteproduct(request, productid=None):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Single Permission Details', 'all'])
+# @deco.get_permission(['view_product'])
 def getproducts_auth(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},

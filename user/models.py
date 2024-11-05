@@ -9,8 +9,15 @@ from helps.common.generic import Generichelps as ghelp
 def generate_unique_code():
     return ghelp().getUniqueCodePattern()
 
+class Permissioncategory(Basic):
+    name = models.CharField(max_length=50, unique=True)
+    def __str__(self):
+        return f'{self.id} - {self.name}'
+
+
 class Permission(Basic):
     name = models.CharField(max_length=50, unique=True)
+    category = models.ForeignKey(Permissioncategory, on_delete=models.CASCADE, related_name='permissions')
     # code  = models.CharField(max_length=15, default=generate_code, unique=True, editable=False)
     # active = models.BooleanField(default=True)
     # created_at = models.DateTimeField(auto_now_add=True)
@@ -21,13 +28,15 @@ class Permission(Basic):
     
 class Role(Basic):
     name = models.CharField(max_length=50, blank=True, null=True)
-    permission = models.ManyToManyField(Permission, blank=True)
+    permission = models.ManyToManyField(Permission, blank=True, related_name='permission')
     # active = models.BooleanField(default=True)
     # created_at = models.DateTimeField(auto_now_add=True)
     # updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.id} - {self.name}'
+    
+
 
 class User(AbstractUser):
     name = models.CharField(max_length=150, blank=True, null=True)

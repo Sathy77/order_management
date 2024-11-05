@@ -26,9 +26,10 @@ class Expense(Basic):
     def __str__(self):
         return f'{self.id} - {self.title}' 
     
-class Transectionincome(Basic):
-    income = models.ForeignKey(Income, on_delete=models.CASCADE, related_name='transectionincome_income')
-    ordersummary = models.ForeignKey(MODELS_ORDE.Ordersummary, on_delete=models.SET_NULL, null=True, blank=True, related_name='transectionincome_ordersummary')
+class Transection(Basic):
+    income = models.ForeignKey(Income, on_delete=models.SET_NULL, null=True, blank=True, related_name='transection_income')
+    expense = models.ForeignKey(Expense, on_delete=models.SET_NULL, null=True, blank=True, related_name='transection_expense')
+    ordersummary = models.ForeignKey(MODELS_ORDE.Ordersummary, on_delete=models.SET_NULL, null=True, blank=True, related_name='transection_ordersummary')
     reference = models.CharField(max_length=100, blank=True, null=True)
     date = models.DateField()
     amount = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
@@ -36,12 +37,12 @@ class Transectionincome(Basic):
     def __str__(self):
         return f'{self.id} - {self.date}'
     
-class Transectionexpense(Basic):
-    expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='transectionexpense_expense')
-    ordersummary = models.ForeignKey(MODELS_ORDE.Ordersummary, on_delete=models.SET_NULL, null=True, blank=True, related_name='transectionexpense_ordersummary')
-    reference = models.CharField(max_length=100, blank=True, null=True)
-    date = models.DateField()
-    amount = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
+# class Transectionexpense(Basic):
+#     expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='transectionexpense_expense')
+#     ordersummary = models.ForeignKey(MODELS_ORDE.Ordersummary, on_delete=models.SET_NULL, null=True, blank=True, related_name='transectionexpense_ordersummary')
+#     reference = models.CharField(max_length=100, blank=True, null=True)
+#     date = models.DateField()
+#     amount = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
-    def __str__(self):
-        return f'{self.id} - {self.date}' 
+#     def __str__(self):
+#         return f'{self.id} - {self.date}' 

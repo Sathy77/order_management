@@ -17,17 +17,17 @@ from PIL import Image
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Single Permission Details', 'all'])
+# @deco.get_permission(['view_setting'])
 def getsettings(request):
     if not MODELS_OMSE.Settings.objects.all().exists():
-        demo_logo_path=BASE_DIR / 'media/files/company/ABC/logo/demo.jpg'
+        demo_logo_path=BASE_DIR / 'media/files/company/default/logo/demo.jpg'
         image = Image.open(demo_logo_path)
         thumb_io = BytesIO()
         image.save(thumb_io, format='JPEG')
         
         instance=MODELS_OMSE.Settings()
-        instance.company_name='ABC'
-        instance.address='ABC, Dhaka, Bangladesh'
+        instance.company_name='Your Company name'
+        instance.address='Your Company address'
         instance.phone_number='01700000000'
         instance.email='gamil@gmail.com'
         instance.logo.save('logo.jpg', ContentFile(thumb_io.getvalue()), save=True)
@@ -94,7 +94,7 @@ def getsettings(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Permission list Details', 'all'])
+# @deco.get_permission(['edit_setting'])
 def updatesetting(request, settingid=None):
     requestdata = dict(request.data)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})

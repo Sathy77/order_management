@@ -11,13 +11,13 @@ class Expenseserializer(serializers.ModelSerializer):
         model = models.Expense
         fields = '__all__'
 
-class Transectionincomeserializer(serializers.ModelSerializer):
+class Transectionserializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Transectionincome
+        model = models.Transection
         fields = '__all__'
 
-class Transectionexpenseserializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Transectionexpense
-        fields = '__all__'
+# class Transectionexpenseserializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = models.Transectionexpense
+#         fields = '__all__'
 

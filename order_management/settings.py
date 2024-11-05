@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     'zone.apps.ZoneConfig',
     'order.apps.OrderConfig',
     'account.apps.AccountConfig',
-    'om_settings.apps.OmSettingsConfig'
-    # 'department.apps.DepartmentConfig',
+    'om_settings.apps.OmSettingsConfig',
+    'dashboard.apps.DashboardConfig',
     # 'facility.apps.FacilityConfig',
     # 'attendance.apps.AttendanceConfig',
     # 'hrm_settings.apps.HrmSettingsConfig',
@@ -155,11 +155,10 @@ CORS_ALLOWED_ORIGINS = [
     'http://10.10.21.17:49012',
     'http://10.10.20.20:49015',
     'http://10.10.20.20:49016',
-    'http://10.10.20.81:8000',
 
 
 
-
+    'http://10.10.20.77:7000',
     'http://10.10.23.16:7000',
     'http://10.10.23.89:7000',
     'http://*',

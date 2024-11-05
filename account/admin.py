@@ -5,6 +5,6 @@ from account import models
 admin.site.register([
     models.Income,
     models.Expense,
-    models.Transectionincome,
-    models.Transectionexpense,
+    models.Transection,
+    # models.Transectionexpense,
 ])

@@ -21,7 +21,7 @@ class Ordersummary(Basic):
     discount = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
     free_delivery = models.BooleanField(default=False)
     grand_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True, default=0)
-    total_profit = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
+    total_profit = models.FloatField(blank=True, null=True)
     order_status = models.CharField(max_length=25, choices=CHOICE.ORDER_STATUS, default=CHOICE.ORDER_STATUS[0][1])
     payment_status = models.CharField(max_length=25, choices=CHOICE.PAYMENT_STATUS, default=CHOICE.PAYMENT_STATUS[0][1])
 

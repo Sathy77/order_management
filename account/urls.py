@@ -12,7 +12,10 @@ urlpatterns = [
     path('update-expense/<int:expenseid>', views.updateexpense, name='update-expense'),
     path('delete-expense/<int:expenseid>', views.deleteexpense, name='delete-expense'),
 
-    path('add-transection-income/', views.addtransectionincome, name='add-transection-income'),
+    path('get-transection/', views.gettransections, name='get-transection'),
+    path('add-transection/', views.addtransection, name='add-transection'),
+    path('update-transection/<int:transectionid>', views.updatetransection, name='update-transection'),
 
-    path('add-transection-expense/', views.addtransectionexpense, name='add-transection-expense'),
+    # path('add-transection-expense/', views.addtransectionexpense, name='add-transection-expense'),
+    
 ]

@@ -4,11 +4,11 @@ from order import views
 urlpatterns = [
     path('get-order-summary/', views.getordersummary, name='get-order-summary'),
     path('get-order-items/', views.getorderitems, name='get-order-items'),
-    path('add-order-items/', views.addorderitems_noauth, name='add-order-items'),
+    path('add-order/', views.addorder_noauth, name='add-order'),
 
-    path('update-order-summary-status/<int:ordersummaryid>', views.updateordersummarystatus, name='update-order-summary-status'),
+    path('update-order-status/<int:ordersummaryid>', views.updateorderstatus, name='update-order-status'),
 
-    path('add-order-items-auth/', views.addorderitem_auth, name='add-order-items-auth'),
-    path('update-order-item-auth/<int:ordersummaryid>', views.updateorderitem_auth, name='update-order-item-auth'),
+    path('add-order-auth/', views.addorder_auth, name='add-order-auth'),
+    path('update-order-auth/<int:ordersummaryid>', views.updateorder_auth, name='update-order-auth'),
     # path('delete-zone/<int:zoneid>', views.deletezone, name='delete-zone'),
 ]

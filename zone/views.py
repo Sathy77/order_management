@@ -9,11 +9,11 @@ from rest_framework.response import Response
 from helps.choice import common as CHOICE
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from helps.decorators.decorator import CommonDecorator as deco
 
 
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Single Permission Details', 'all'])
 def getdeliveryzones_noauth(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -35,7 +35,7 @@ def getdeliveryzones_noauth(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['get company info', 'all'])
+# @deco.get_permission(['create_delivery_zone'])
 def adddeliveryzone(request):
     requestdata = request.data.copy()
     userid = request.user.id
@@ -56,7 +56,7 @@ def adddeliveryzone(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Permission list Details', 'all'])
+# @deco.get_permission(['edit_delivery_zone'])
 def updatedeliveryzone(request, deliveryzoneid=None):
     userid = request.user.id
     extra_fields = {}
@@ -73,7 +73,7 @@ def updatedeliveryzone(request, deliveryzoneid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Permission list Details', 'all'])
+# @deco.get_permission(['delete_delivery_zone'])
 def deletedeliveryzone(request, deliveryzoneid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_ZONE.Deliveryzone,
@@ -83,7 +83,7 @@ def deletedeliveryzone(request, deliveryzoneid=None):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['Get Single Permission Details', 'all'])
+# @deco.get_permission(['view_delivery_zone'])
 def getdeliveryzones_auth(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
