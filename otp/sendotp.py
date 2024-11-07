@@ -17,24 +17,44 @@ def send_otp(otp, phone):
     return response.status_code
 
 
+# def verify_otp(contact_no, otp_code):
+#     response = {'flag': False, 'message': [], 'instance': None}
+#     contact_no = '8801' + contact_no[-9:]
+#     # print(contact_no)
+
+#     otp_instance = MODELS_OTP.Otp.objects.filter(phone=contact_no, otp_code=otp_code)
+#     if otp_instance.exists():
+#         response['instance'] = otp_instance
+
+#         # Check if the OTP is expired
+#         if otp_instance.first().is_expired():
+#             response['message'].append("OTP has expired.")
+#         else: 
+#             response['flag']= True
+#             response['message'].append("OTP verified successfully!")
+#         # OTP is valid and not expired
+
+#     else: response['message'].append("Invalid OTP or phone number.")
+#     # print("response", response)
+        
+#     return response
+
 def verify_otp(contact_no, otp_code):
     response = {'flag': False, 'message': []}
-
     contact_no = '8801' + contact_no[-9:]
-    print(contact_no)
+    # print(contact_no)
 
-    try:
-        otp_instance = MODELS_OTP.Otp.objects.get(phone=contact_no, otp_code=otp_code)
+    otp_instance = MODELS_OTP.Otp.objects.filter(phone=contact_no, otp_code=otp_code)
+    if otp_instance.exists():
 
         # Check if the OTP is expired
-        if otp_instance.is_expired():
+        if otp_instance.first().is_expired():
             response['message'].append("OTP has expired.")
         else: 
             response['flag']= True
             response['message'].append("OTP verified successfully!")
         # OTP is valid and not expired
 
-    except MODELS_OTP.Otp.DoesNotExist:
-        response['message'].append("Invalid OTP or phone number.")
+    else: response['message'].append("Invalid OTP or phone number.")
         
     return response

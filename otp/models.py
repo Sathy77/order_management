@@ -6,7 +6,7 @@ import datetime
 
 class Otp(models.Model):
     phone = models.CharField(max_length=14)  # Reference to the user
-    otp_code = models.CharField(max_length=4)  # OTP code, assuming 4 digits
+    otp_code = models.CharField(max_length=10)  # OTP code, assuming 4 digits
     created_at = models.DateTimeField(default=timezone.now)
 
     def is_expired(self):

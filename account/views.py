@@ -380,7 +380,7 @@ def updatetransection(request, transectionid=None):
                         response_successflag = responsesuccessflag
                     else: response_message.append('Expense id is not valid!')
 
-        elif previous_expenseid: 
+        elif previous_expenseid:
             if new_expense: 
                 # requestdata.update({'income': None})
                 amount = previous_amount - new_amount

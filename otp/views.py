@@ -16,10 +16,10 @@ def generate_otp(request):
     contact_no = requestdata.get('contact_no')
     contact_no = '8801' + contact_no[-9:]
     otp = random.randint(1000, 9999)
+    # otp = f'OTP- {random.randint(1000, 9999)}'
     phone = [contact_no]
     # Create and save a new OTP
     otpintance = MODELS_OTP.Otp(phone=contact_no, otp_code=otp)
-    print(otpintance)
     otpintance.save()
 
     cutoff_time = timezone.now() - timedelta(minutes=10)
@@ -28,7 +28,19 @@ def generate_otp(request):
 
     status_code = sendotp.send_otp(otp, phone)
 
-    return Response( status=status_code)
+    if status_code == status.HTTP_200_OK:
+        response_data = {
+            'status': 'success',
+            'message': 'OTP sent successfully.'
+            # 'otp': otp  # include OTP here only if needed for debugging or testing
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    else:
+        response_data = {
+            'status': 'error',
+            'message': 'Failed to send OTP.'
+        }
+        return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
 # @api_view(['POST'])
 # def verify_otp(request):

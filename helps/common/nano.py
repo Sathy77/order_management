@@ -114,6 +114,7 @@ class Nanohelps(Picohelps):
             if allowed_fields == '__all__':
                 for datakey in data.keys():
                     if data[datakey]: preparedata.update(data)
+                    if data[datakey] == 0: preparedata.update(data)
         elif isinstance(allowed_fields, list):
             for field in allowed_fields:
                 fieldvalue = data.get(field)

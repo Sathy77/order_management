@@ -211,12 +211,14 @@ def addorder_noauth(request):
 
     contact_no = request.data.get('contact_no')
     otp = request.data.get('otp')
-    otp_message = sendotp.verify_otp(contact_no , otp)
+    if contact_no and otp:
+        otp_message = sendotp.verify_otp(contact_no , otp)
 
-    if otp_message['flag']:
-        userid = request.user.id
-        free_delivery = True
-        if contact_no:
+        if otp_message['flag']:
+        # if True:
+            userid = request.user.id
+            free_delivery = True
+            # if contact_no:
             delevaryzoneid = requestdata.get('deliveryzone')
             deliverycost = 0
             if delevaryzoneid:
@@ -246,7 +248,7 @@ def addorder_noauth(request):
                     if not response_message:
                         response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
                         if not response['message']:
-                            user = MODELS_USER.User.objects.filter(contact_no=contact_no) 
+                            user = MODELS_USER.User.objects.filter(contact_no=contact_no)
                             if not user.exists():
                                 allowed_fields = ['name', 'address', 'contact_no', 'email']
                                 extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'created_by': userid, 'updated_by': userid}
@@ -346,23 +348,29 @@ def addorder_noauth(request):
                                                 quantity -= order_quantity
                                                 prepare_data={'quntity': quantity}
                                                 ghelp().updaterecord(classOBJ=MODELS_PROD.Product, Serializer=POST_SRLZER_PROD.Productserializer, id=productkey,data=prepare_data)
+
                                     elif responsesuccessflag == 'error': response_message.extend(responsemessage)
                         else: response_message.extend(response['message'])
                 else: response_message.append('delivary zone id is invalid!')
             else: response_message.append('delivary zone is required!')
-        else: response_message.append('please provide contact number!')
-        if response_successflag == 'success':
-            MODELS_OTP.Otp.objects.get(phone=contact_no, otp_code=otp).delete()
-    # print(otp_message['message'] ==  ['OTP has expired.'])
-    if otp_message['message'] ==  ['OTP has expired.']:
-        MODELS_OTP.Otp.objects.get(phone=contact_no, otp_code=otp).delete()
+            # else: response_message.append('please provide contact number!')
+            if response_successflag == 'success':
+                otp_instance = MODELS_OTP.Otp.objects.filter(phone=contact_no, otp_code=otp)
+                if otp_instance.exists():
+                    otp_instance.delete()
+        else:
+            if 'OTP has expired.' in otp_message['message']:
+                otp_instance = MODELS_OTP.Otp.objects.filter(phone=contact_no, otp_code=otp)
+                if otp_instance.exists():
+                    otp_instance.delete()
+    else: response_message.append('please provide contact number and OTP!')
     return Response({'data': response_data, 'otp': otp_message, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 
 
 
 @api_view(['PUT'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 # @deco.get_permission(['edit_order_status'])
 def updateorderstatus(request, ordersummaryid=None):
     response_data = {}
