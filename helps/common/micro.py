@@ -79,7 +79,7 @@ class Microhelps(Nanohelps):
                 if id:
                     if data:
                         classobj = classOBJ.objects.filter(id=id)
-                        print(classobj)
+                        # print(classobj)
                         if classobj.exists():
                             preparedata = {}
                             self.filterAllowedFields(allowed_fields, data, preparedata)

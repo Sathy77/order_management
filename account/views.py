@@ -36,7 +36,7 @@ def getincomes(request):
     )
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
-        {'name': 'name', 'convert': None, 'replace':'name__icontains'},
+        {'name': 'title', 'convert': None, 'replace':'title__icontains'},
         {'name': 'balance', 'convert': None, 'replace':'balance'}
     ]
     incomes = MODELS_ACCO.Income.objects.filter(**ghelp().KWARGS(request, filter_fields))
@@ -119,7 +119,7 @@ def getexpenses(request):
     )
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
-        {'name': 'name', 'convert': None, 'replace':'name__icontains'},
+        {'name': 'title', 'convert': None, 'replace':'title__icontains'},
         {'name': 'balance', 'convert': None, 'replace':'balance'}
     ]
     expenses = MODELS_ACCO.Expense.objects.filter(**ghelp().KWARGS(request, filter_fields))

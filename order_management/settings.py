@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'om_settings.apps.OmSettingsConfig',
     'dashboard.apps.DashboardConfig',
-    # 'facility.apps.FacilityConfig',
+    'otp.apps.OtpConfig',
     # 'attendance.apps.AttendanceConfig',
     # 'hrm_settings.apps.HrmSettingsConfig',
 
