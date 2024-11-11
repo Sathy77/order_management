@@ -54,7 +54,7 @@ class Microhelps(Nanohelps):
                                 response_successflag = 'success'
                                 response_status = status.HTTP_201_CREATED
                             except:
-                                print(serializer)
+                                # print(serializer)
                                 response_message.append('unique combination is already exist!')
                         else:
                             print(serializer.errors)

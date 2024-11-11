@@ -382,7 +382,7 @@ def updateorderstatus(request, ordersummaryid=None):
     userid = request.user.id
     new_order_status = requestdata.get('order_status')
     new_payment_status = requestdata.get('payment_status')
-    print("new_payment_statusnew_payment_status",new_payment_status)
+    # print("new_payment_statusnew_payment_status",new_payment_status)
     
     if ordersummaryid:
         ordersummary = MODELS_ORDE.Ordersummary.objects.filter(id=ordersummaryid)
@@ -575,7 +575,7 @@ def updateorderstatus(request, ordersummaryid=None):
 
 
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 # @deco.get_permission(['create_order'])
 def addorder_auth(request):
     response_data = {}

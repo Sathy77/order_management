@@ -9,6 +9,8 @@ from account import models as MODELS_ACCO
 from zone import models as MODELS_ZONE
 from order import models as MODELS_ORDE
 from product import models as MODELS_PROD
+from datetime import datetime, timedelta
+from django.utils.timezone import now
 
 # Create your views here.
 @api_view(['GET'])
@@ -74,7 +76,7 @@ def getmonthlyprofit (request):
             profit = total_income_amount - total_expense_amount
             per_month={'year': current_year, 'month': current_month, 'profit': profit}
             response_data.append(per_month)
-        else: 
+        else:
             per_month={'year': current_year, 'month': current_month, 'profit': profit}
             response_data.append(per_month)
         current_month -=1
@@ -146,91 +148,133 @@ def getmonthlyitemwisesales(request):
 
     current_month = timezone.now().month
     current_year = timezone.now().year
-    # requestdata = request.data.copy()
+
+    twelve_months_ago = now() - timedelta(days=365)
     heads = request.GET.get('head') 
-    print(heads)
 
     if heads in ['quantity', 'Quantity']:
         # Fetch top 10 products by sales quantity for the current month and specified order statuses
-        for i in range(12):
-            product_data=[]
-            top_products = (
-                MODELS_ORDE.Orderitems.objects
-                .filter(
-                    ordersummary__date__month=current_month,
-                    ordersummary__date__year=current_year,
-                    ordersummary__order_status__in=["Pending", "On Process", "Hand over to courier", "Delivered"]
-                )
-                .values('product__name')  # Group by product name
-                .annotate(total_quantity=Sum('order_quantity'))  # Calculate total quantity per product
-                .order_by('-total_quantity')[:10]  # Get top 10
+        top_products_yearly = (
+            MODELS_ORDE.Orderitems.objects
+            .filter(
+                ordersummary__date__gte=twelve_months_ago,
+                ordersummary__order_status__in=["Pending", "On Process", "Hand over to courier", "Delivered"]
             )
+            .values('product__name')  # Group by product name
+            .annotate(total_quantity=Sum('order_quantity'))  # Calculate total quantity per product
+            .order_by('-total_quantity')[:10]  # Get top 10 products
+        )
+        # Step 2: For each of the top products, calculate monthly quantities
+        response_data = []
 
-            # Check if any results are returned
-            if not top_products:
-                product_ = {
-                        "product_name": "No products found for the current month ",
-                        "total_quantity": 0
-                    }
-                product_data.append(product_)
-            else:
-                # Format the result data
-                for product in top_products:
-                    product_ = {
-                        "product_name": product['product__name'],
-                        "total_quantity": product['total_quantity']
-                    }
-                    product_data.append(product_)
-            data = {
-                    "year": current_year,
+        for product in top_products_yearly:
+            product_name = product['product__name']
+            
+            # Initialize monthly data for this product
+            monthly_data = []
+
+            # Loop through each month in the last year
+            for i in range(12):
+                # Filter for the product in the specific month and year
+                monthly_quantity = (
+                    MODELS_ORDE.Orderitems.objects
+                    .filter(
+                        product__name=product_name,
+                        ordersummary__date__year=current_year,
+                        ordersummary__date__month=current_month,
+                        ordersummary__order_status__in=["Pending", "On Process", "Hand over to courier", "Delivered"]
+                    )
+                    .aggregate(total_quantity=Sum('order_quantity'))
+                )
+
+                # Get the quantity or default to 0 if no sales
+                total_quantity = monthly_quantity['total_quantity'] or 0
+
+                # Add the monthly data for this product
+                monthly_data.append({
                     "month": current_month,
-                    "product_data": product_data,
-                }
-            response_data.append(data)
-            current_month -=1
-            if current_month == 0:
-                current_month = 12
-                current_year -= 1 
-    
-    if heads in ['Selas', 'selas']:
-        for i in range(12):
-            product_data=[]
-            top_products = (
+                    "year": current_year,
+                    "total_quantity": total_quantity
+                })
+
+                # Move to the previous month
+                current_month -= 1
+                if current_month == 0:
+                    current_month = 12
+                    current_year -= 1
+
+            # Append product data to the response
+            response_data.append({
+                "product_name": product_name,
+                "total_quantity_year": product['total_quantity'],
+                "monthly_data": monthly_data
+            }) 
+            current_year = now().year
+            current_month = now().month   
+
+    if heads in ['Sales', 'sales']:
+        try:
+            top_products_yearly = (
                 MODELS_ORDE.Orderitems.objects
                 .filter(
-                    ordersummary__date__month=current_month,
-                    ordersummary__date__year=current_year,
+                    ordersummary__date__gte=twelve_months_ago,
                     ordersummary__order_status__in=["Pending", "On Process", "Hand over to courier", "Delivered"]
                 )
                 .values('product__name')  # Group by product name
-                .annotate(total_sales=Sum(F('order_quantity') * F('unit_mrp')) ) # Calculate total quantity per product
-                .order_by('-total_sales')[:10]  # Get top 10
+                .annotate(total_sales=Sum(F('order_quantity') * F('unit_mrp')))  # Calculate total sales per product
+                .order_by('-total_sales')[:10]  # Get top 10 products by sales
             )
-            # Check if any results are returned
-            if not top_products:
-                product_ = {
-                        "product_name": "No products found for the current month ",
-                        "total_sales": 0
-                    }
-                product_data.append(product_)
-            else:
-                # Format the result data
-                for product in top_products:
-                    product_ = {
-                        "product_name": product['product__name'],
-                        "total_sales": product['total_sales']
-                    }
-                    product_data.append(product_)
-            data = {
-                    "year": current_year,
-                    "month": current_month,
-                    "product_data": product_data,
-                }
-            response_data.append(data)
-            current_month -=1
-            if current_month == 0:
-                current_month = 12
-                current_year -= 1
+        except Exception as e:
+            top_products_yearly = []
+
+        # Step 2: For each of the top products, calculate monthly sales amounts
+        response_data = []
+        if top_products_yearly:
+            for product in top_products_yearly:
+                product_name = product['product__name']
+                
+                # Initialize monthly data for this product
+                monthly_data = []
+
+                # Loop through each month in the last year
+                for i in range(12):
+                    # Filter for the product in the specific month and year
+                    monthly_sales = (
+                        MODELS_ORDE.Orderitems.objects
+                        .filter(
+                            product__name=product_name,
+                            ordersummary__date__year=current_year,
+                            ordersummary__date__month=current_month,
+                            ordersummary__order_status__in=["Pending", "On Process", "Hand over to courier", "Delivered"]
+                        )
+                        .aggregate(total_sales=Sum(F('order_quantity') * F('unit_mrp')))
+                    )
+                    # Get the sales amount or default to 0 if no sales
+                    total_sales = monthly_sales['total_sales'] or 0
+
+                    # Add the monthly data for this product
+                    monthly_data.append({
+                        "month": current_month,
+                        "year": current_year,
+                        "total_sales": total_sales
+                    })
+
+                    # Move to the previous month
+                    current_month -= 1
+                    if current_month == 0:
+                        current_month = 12
+                        current_year -= 1
+
+                # Append product data to the response
+                response_data.append({
+                    "product_name": product_name,
+                    "total_sales_year": product['total_sales'],
+                    "monthly_data": monthly_data
+                })
+
+                # Reset current year and month for future use
+                current_year = now().year
+                current_month = now().month  
 
     return Response({
         "data": response_data,
