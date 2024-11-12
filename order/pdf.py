@@ -1,77 +1,72 @@
-
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
+from django.views import View
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfbase import pdfmetrics
-from order import models as MODELS_ORDE
-from rest_framework.decorators import api_view
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from django.utils import timezone
+from order import models as MODELS_ORDE  # Replace with your actual app name
+from io import BytesIO
 
-# Register Bangla font
-pdfmetrics.registerFont(TTFont('BanglaFont', 'pdf/bangla/kalpurush.ttf'))
+class OrderSummaryPDFView(View):
+    def get(self, request, *args, **kwargs):
+        # Create a BytesIO buffer for the PDF
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=A4)
+        
+        # Set up the PDF
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(200, 820, "Order Summary Report")
+        c.setFont("Helvetica", 10)
+        c.drawString(50, 800, f"Date: {timezone.now().strftime('%Y-%m-%d')}")
+        c.line(50, 795, 550, 795)
+        
+        # Column Headers
+        headers = ["Invoice No", "Customer", "Date", "Delivery Zone", "Payment Mode", "Total", "Status"]
+        x_offsets = [50, 100, 200, 300, 380, 460, 520]
+        for i, header in enumerate(headers):
+            c.drawString(x_offsets[i], 770, header)
+        c.line(50, 765, 550, 765)
+        
+        # Fetch orders
+        orders = MODELS_ORDE.Ordersummary.objects.filter(invoice_no__isnull=False)
+        y = 750  # Start position for rows
+        
+        for order in orders:
+            # Get data for each order row
+            deliveryzone_name = order.deliveryzone.name if order.deliveryzone else 'N/A'
+            payment_mode = order.get_payment_mode_display()
+            order_status = order.get_order_status_display()
 
-@api_view(['GET'])
-def generate_ordersummary_pdf(request):
-    # Set up response and PDF canvas
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="ordersummary.pdf"'
-    p = canvas.Canvas(response, pagesize=letter)
-    width, height = letter
-    y_position = height - 80
-
-    # Column settings
-    col_positions = [50, 120, 190, 250, 350, 420, 540]
-    col_titles = ["Invoice No", "Customer", "Date", "Payment Mode", "Grand Total", "Delivery Zone", "Status"]
-    line_height = 20
-
-    # Title
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, y_position, "Order Summary List")
-    y_position -= 40
-
-    # Column Headers
-    p.setFont("Helvetica-Bold", 10)
-    for idx, title in enumerate(col_titles):
-        p.drawString(col_positions[idx], y_position, title)
-    y_position -= line_height
-
-    # Content Rows
-    orders = MODELS_ORDE.Ordersummary.objects.all()
-    for order in orders:
-        if y_position < 50:
-            p.showPage()
-            y_position = height - 80
-            for idx, title in enumerate(col_titles):
-                p.drawString(col_positions[idx], y_position, title)
-            y_position -= line_height
-
-        # Data for each column
-        data = [
-            order.invoice_no or "N/A",
-            order.user.name or "N/A",
-            str(order.date) or "N/A",
-            order.payment_mode or "N/A",
-            f"${order.grand_total:.2f}",
-        ]
-
-        # Draw each column data except the Bangla field
-        p.setFont("Helvetica", 9)
-        for idx, text in enumerate(data):
-            p.drawString(col_positions[idx], y_position, text)
-
-        # Draw the Delivery Zone name in Bangla font
-        p.setFont("BanglaFont", 9)
-        delivery_zone_name = order.deliveryzone.name if order.deliveryzone else "N/A"
-        p.drawString(col_positions[5], y_position, delivery_zone_name)
-
-        p.setFont("Helvetica", 9)
-        status = order.order_status if order.order_status else "N/A"
-        p.drawString(col_positions[6], y_position, status)
-
-        # Reset for next row
-        y_position -= line_height
-
-    # Finalize PDF
-    p.showPage()
-    p.save()
-    return response
+            # Row data
+            row_data = [
+                order.invoice_no,
+                order.user.name,
+                order.date.strftime('%Y-%m-%d'),
+                deliveryzone_name,
+                payment_mode,
+                f"{order.grand_total:.2f}",
+                order_status
+            ]
+            
+            # Draw each row in the PDF
+            for i, data in enumerate(row_data):
+                c.drawString(x_offsets[i], y, str(data))
+            y -= 20
+            
+            # Create a new page if space runs out
+            if y < 50:
+                c.showPage()
+                y = 770
+                for i, header in enumerate(headers):
+                    c.drawString(x_offsets[i], y, header)
+                y -= 20
+        
+        c.save()
+        
+        # Get the PDF data from the buffer and return it as a response
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="order_summary_report.pdf"'
+        
+        return response
