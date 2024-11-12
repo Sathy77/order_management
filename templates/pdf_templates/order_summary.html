@@ -1,0 +1,51 @@
+
+<!-- {% load static %} -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @font-face {
+            
+            font-family: 'NotoSansBengali';
+            src: url("/static/fonts/NotoSansBengali-Regular.ttf") format("truetype");
+        }
+        
+        body { font-family: 'NotoSansBengali', sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .header { font-size: 20px; font-weight: bold; margin-bottom: 20px; }
+        .total { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">Order Summary Report</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice No</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Delivery Zone</th>
+                <th>Payment Mode</th>
+                <th>Total</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.invoice_no }}</td>
+                <td>{{ order.user.name }}</td>
+                <td>{{ order.date }}</td>
+                <td>{{ order.deliveryzone.name|safe }}</td> <!-- Delivery Zone in Bangla -->
+                <td>{{ order.get_payment_mode_display }}</td>
+                <td>{{ order.grand_total }}</td>
+                <td>{{ order.get_order_status_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

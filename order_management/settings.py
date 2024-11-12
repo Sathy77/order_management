@@ -1,4 +1,5 @@
 import environ
+import os
 # from dotenv import load_dotenv
 from pathlib import Path
 from datetime import timedelta
@@ -161,6 +162,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://10.10.20.77:7000',
     'http://10.10.23.16:7000',
     'http://10.10.23.89:7000',
+    'http://113.212.109.147:49014',
     'http://*',
 ]   
 
@@ -171,7 +173,7 @@ ROOT_URLCONF = 'order_management.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -182,6 +184,8 @@ TEMPLATES = [
             ],
         },
     },
+   
+
 ]
 
 WSGI_APPLICATION = 'order_management.wsgi.application'
