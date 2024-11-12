@@ -1,6 +1,6 @@
 from django.urls import path
 from order import views
-from order import pdf
+
 
 urlpatterns = [
     path('get-order-summary/', views.getordersummary, name='get-order-summary'),
@@ -12,6 +12,4 @@ urlpatterns = [
     path('add-order-auth/', views.addorder_auth, name='add-order-auth'),
     path('update-order-auth/<int:ordersummaryid>', views.updateorder_auth, name='update-order-auth'),
     # path('delete-zone/<int:zoneid>', views.deletezone, name='delete-zone'),
-
-    path('order-summary-pdf/', pdf.generate_order_summary_pdf, name='order_summary_pdf'),
 ]

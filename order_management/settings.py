@@ -1,5 +1,4 @@
 import environ
-import os
 # from dotenv import load_dotenv
 from pathlib import Path
 from datetime import timedelta
@@ -173,7 +172,7 @@ ROOT_URLCONF = 'order_management.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -184,8 +183,6 @@ TEMPLATES = [
             ],
         },
     },
-   
-
 ]
 
 WSGI_APPLICATION = 'order_management.wsgi.application'
@@ -247,10 +244,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Your static directory
-]
-# STATIC_URL = 'static/'
+
+STATIC_URL = '/static/'
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = "/media/"
 

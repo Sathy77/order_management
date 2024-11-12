@@ -94,7 +94,6 @@ def getorderitems(request):
         'results': orderitemsserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
-
 # @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
 # # @deco.get_permission(['get company info', 'all'])
@@ -575,7 +574,7 @@ def updateorderstatus(request, ordersummaryid=None):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 # @deco.get_permission(['create_order'])
 def addorder_auth(request):
     response_data = {}
