@@ -16,4 +16,4 @@ class Ordersummaryserializer(serializers.ModelSerializer):
     orderitems_ordersummary=Orderitemsserializer(many=True)
     class Meta:
         model = models.Ordersummary
-        fields = ['id', 'user', 'date', 'invoice_no', 'deliveryzone', 'payment_mode', 'product_cost', 'coupon', 'discount', 'free_delivery', 'grand_total', 'total_profit', 'order_status', 'orderitems_ordersummary']
+        fields = ['id', 'user', 'date', 'invoice_no', 'deliveryzone', 'payment_mode', 'product_cost', 'coupon', 'discount', 'free_delivery', 'grand_total', 'total_profit', 'order_status', 'payment_status', 'orderitems_ordersummary']
