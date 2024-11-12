@@ -13,5 +13,5 @@ urlpatterns = [
     path('update-order-auth/<int:ordersummaryid>', views.updateorder_auth, name='update-order-auth'),
     # path('delete-zone/<int:zoneid>', views.deletezone, name='delete-zone'),
 
-     path('order-summary-pdf/', pdf.OrderSummaryPDFView.as_view(), name='order_summary_pdf'),
+    path('order-summary-pdf/', pdf.generate_order_summary_pdf, name='order_summary_pdf'),
 ]
