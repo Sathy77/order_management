@@ -5,10 +5,12 @@ from django.http import HttpResponse
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from order import models as MODELS_ORDE
+from rest_framework.decorators import api_view
 
 # Register Bangla font
-pdfmetrics.registerFont(TTFont('BanglaFont', 'pdf/bangla/SolaimanLipi_29-05-06.ttf'))
+pdfmetrics.registerFont(TTFont('BanglaFont', 'pdf/bangla/kalpurush.ttf'))
 
+@api_view(['GET'])
 def generate_ordersummary_pdf(request):
     # Set up response and PDF canvas
     response = HttpResponse(content_type='application/pdf')
