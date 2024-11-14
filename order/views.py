@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from helps.decorators.decorator import CommonDecorator as deco
 from zone import models as MODELS_ZONE
 from order import models as MODELS_ORDE
+from order import models as MODELS_ORDE
 from user import models as MODELS_USER
 from product import models as MODELS_PROD
 from account import models as MODELS_ACCO
@@ -208,6 +209,11 @@ def addorder_noauth(request):
     response_status = status.HTTP_400_BAD_REQUEST
     requestdata = request.data.copy()
 
+    last_order_id = MODELS_ORDE.Storeorderid.objects.all().order_by('id').last()
+    if not last_order_id : 
+        prepare_data={'last_order_id': 1}
+        ghelp().addtocolass(classOBJ=MODELS_ORDE.Storeorderid, Serializer=POST_SRLZER_ORDE.Storeorderidserializer,data=prepare_data)
+
     contact_no = request.data.get('contact_no')
     otp = request.data.get('otp')
     if contact_no and otp:
@@ -297,9 +303,9 @@ def addorder_noauth(request):
                                 ##create ordersummary
                                 if not response_message:
                                     #invoice auto create
-                                    orderitems = MODELS_ORDE.Orderitems.objects.all().order_by('id').last()
+                                    last_order_id = MODELS_ORDE.Storeorderid.objects.all().order_by('id').last()
                                     inv_first_serial = 100000
-                                    inv_current_serial = inv_first_serial + orderitems.id if orderitems else inv_first_serial + 1
+                                    inv_current_serial = inv_first_serial + last_order_id.last_order_id + 1 if last_order_id else inv_first_serial + 1
                                     invoice_no = f'INV{inv_current_serial}'
 
                                     prepare_data={
@@ -322,6 +328,14 @@ def addorder_noauth(request):
                                         data=prepare_data,
                                         required_fields=required_fields
                                     )
+
+                                    #store last order id
+                                    if responsesuccessflag == 'success':
+                                        last_order_id = MODELS_ORDE.Storeorderid.objects.all().order_by('id').last()
+                                        if last_order_id : 
+                                            prepare_data={'last_order_id': responsedata.data['id']}
+                                            ghelp().updaterecord(classOBJ=MODELS_ORDE.Storeorderid, Serializer=POST_SRLZER_ORDE.Storeorderidserializer, id=last_order_id.id,data=prepare_data)
+            
                                     
                                     #create orderitems and update product quantity
                                     if responsesuccessflag == 'success':
@@ -369,7 +383,7 @@ def addorder_noauth(request):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 # @deco.get_permission(['edit_order_status'])
 def updateorderstatus(request, ordersummaryid=None):
     response_data = {}
@@ -465,14 +479,19 @@ def updateorderstatus(request, ordersummaryid=None):
                 if previous_payment_status == CHOICE.PAYMENT_STATUS[2][1]: #previous recive
                         if new_payment_status in [CHOICE.PAYMENT_STATUS[1][1], CHOICE.PAYMENT_STATUS[0][1]]: #new partial, pending
                             response_message.append(f"({previous_payment_status}) product can/'t updated to ({new_payment_status})")
-
+                
                 elif previous_payment_status == CHOICE.PAYMENT_STATUS[1][1]: #previous partial
                     if new_payment_status == CHOICE.PAYMENT_STATUS[2][1]: #new recive
                         transections = MODELS_ACCO.Transection.objects.filter(ordersummary=ordersummaryid)
                         if incomeid:
                             if transections:
-                                partial_amount = transections.first().amount
-                                rest_amount = grand_total - partial_amount
+                                sum_partial_amount = 0
+                                for transection in transections:
+                                    partial_amount = transection.amount
+                                    sum_partial_amount += partial_amount
+
+                                if sum_partial_amount < grand_total:
+                                    rest_amount = grand_total - sum_partial_amount
                                 
                                 income_balance = income.first().balance
                                 income_balance = income_balance + rest_amount
@@ -513,22 +532,119 @@ def updateorderstatus(request, ordersummaryid=None):
                                             data=prepare_data
                                         )
                                         response_data = response_data.data if response_successflag == 'success' else {}
+
+                    elif new_payment_status == CHOICE.PAYMENT_STATUS[1][1]: #new partial
+                        transections = MODELS_ACCO.Transection.objects.filter(ordersummary=ordersummaryid)
+                        if incomeid:
+                            if transections:
+                                sum_partial_amount = 0
+                                for transection in transections:
+                                    partial_amount = transection.amount
+                                    sum_partial_amount += partial_amount
+
+                                if sum_partial_amount < grand_total:
+                                    rest_amount = grand_total - sum_partial_amount
+                                new_partial_amount = requestdata.get('partial_amount')
+                                if new_partial_amount:
+                                    if new_partial_amount > rest_amount:
+                                        response_message.append(f"{new_partial_amount} is is greater than due money {rest_amount}")
+                                    elif new_partial_amount == rest_amount:
+                                        #update income
+                                        income_balance = income.first().balance
+                                        income_balance = income_balance + new_partial_amount
+                                        extra_fields = {}
+                                        if userid: extra_fields.update({'updated_by': userid})
+                                        prepare_data={'balance': income_balance}
+                                        responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().updaterecord(
+                                            classOBJ=MODELS_ACCO.Income, 
+                                            Serializer=POST_SRLZER_ACCO.Incomeserializer, 
+                                            id=incomeid,
+                                            data=prepare_data,
+                                            extra_fields=extra_fields
+                                        )
+                                        response_data = responsedata.data if responsesuccessflag == 'success' else {}
+                                        #create transiction
+                                        if responsesuccessflag == 'success':
+                                            todate = date.today()
+                                            required_fields = ['date', 'amount']
+                                            # fields_regex = [{'field': 'date', 'type': 'date'}]
+                                            prepare_data={'income': incomeid, 'ordersummary': ordersummaryid, 'date': todate, 'amount': new_partial_amount}
+                                            response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
+                                                classOBJ=MODELS_ACCO.Transection, 
+                                                Serializer=POST_SRLZER_ACCO.Transectionserializer, 
+                                                data=prepare_data, 
+                                                # fields_regex=fields_regex, 
+                                                required_fields=required_fields,
+                                            )
+                                            if response_data: response_data = response_data.data
+
+                                        #update payment status reacive
+                                        if response_successflag=='success':
+                                            prepare_data={'payment_status': CHOICE.PAYMENT_STATUS[2][1]}
+                                            response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+                                                classOBJ=MODELS_ORDE.Ordersummary, 
+                                                Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
+                                                id=ordersummaryid,
+                                                data=prepare_data
+                                            )
+                                            response_data = response_data.data if response_successflag == 'success' else {}
+
+                                    elif new_partial_amount < rest_amount:
+                                        #update income
+                                        income_balance = income.first().balance
+                                        income_balance = income_balance + new_partial_amount
+                                        extra_fields = {}
+                                        if userid: extra_fields.update({'updated_by': userid})
+                                        prepare_data={'balance': income_balance}
+                                        responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().updaterecord(
+                                            classOBJ=MODELS_ACCO.Income, 
+                                            Serializer=POST_SRLZER_ACCO.Incomeserializer, 
+                                            id=incomeid,
+                                            data=prepare_data,
+                                            extra_fields=extra_fields
+                                        )
+                                        response_data = responsedata.data if responsesuccessflag == 'success' else {}
+                                        #create transiction
+                                        if responsesuccessflag == 'success':
+                                            todate = date.today()
+                                            required_fields = ['date', 'amount']
+                                            # fields_regex = [{'field': 'date', 'type': 'date'}]
+                                            prepare_data={'income': incomeid, 'ordersummary': ordersummaryid, 'date': todate, 'amount': new_partial_amount}
+                                            response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
+                                                classOBJ=MODELS_ACCO.Transection, 
+                                                Serializer=POST_SRLZER_ACCO.Transectionserializer, 
+                                                data=prepare_data, 
+                                                # fields_regex=fields_regex, 
+                                                required_fields=required_fields,
+                                            )
+                                            if response_data: response_data = response_data.data
+
+                                        #update payment status reacive
+                                        if response_successflag=='success':
+                                            prepare_data={'payment_status': new_payment_status}
+                                            response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+                                                classOBJ=MODELS_ORDE.Ordersummary, 
+                                                Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
+                                                id=ordersummaryid,
+                                                data=prepare_data
+                                            )
+                                            response_data = response_data.data if response_successflag == 'success' else {}
+                                    
                     else: response_message.append(f"{previous_payment_status} product can/'t updated to {new_payment_status}")
                 elif previous_payment_status == CHOICE.PAYMENT_STATUS[0][1]: #previous pending
                     if new_payment_status in [CHOICE.PAYMENT_STATUS[1][1], CHOICE.PAYMENT_STATUS[2][1]]: #new partial / recive
                         #update income
                         if incomeid:
                             if new_payment_status == CHOICE.PAYMENT_STATUS[1][1]: #new partial
-                                partial_amout = requestdata.get('partial_amout')
-                                amout = partial_amout
-                            else: amout = grand_total
+                                partial_amount = requestdata.get('partial_amount')
+                                amount = partial_amount
+                            else: amount = grand_total
                             income_balance = income.first().balance
-                            # amount = requestdata.get('partial_amout')
-                            if amout:
-                                income_balance = income_balance + amout
+                            if amount:
+                                income_balance = income_balance + amount
                             else :
-                                partial_amout = 0
-                                income_balance = income_balance + amout
+                                partial_amount = 0
+                                income_balance = income_balance + amount
                             
                             extra_fields = {}
                             if userid: extra_fields.update({'updated_by': userid})
@@ -546,7 +662,7 @@ def updateorderstatus(request, ordersummaryid=None):
                                 todate = date.today()
                                 required_fields = ['date', 'amount']
                                 # fields_regex = [{'field': 'date', 'type': 'date'}]
-                                prepare_data={'income': incomeid, 'ordersummary': ordersummaryid, 'date': todate, 'amount': amout}
+                                prepare_data={'income': incomeid, 'ordersummary': ordersummaryid, 'date': todate, 'amount': amount}
                                 response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
                                     classOBJ=MODELS_ACCO.Transection, 
                                     Serializer=POST_SRLZER_ACCO.Transectionserializer, 
@@ -582,6 +698,13 @@ def addorder_auth(request):
     response_successflag = 'error'
     response_status = status.HTTP_400_BAD_REQUEST
     requestdata = request.data.copy()
+
+    last_order_id = MODELS_ORDE.Storeorderid.objects.all().order_by('id').last()
+    if not last_order_id : 
+        prepare_data={'last_order_id': 1}
+        ghelp().addtocolass(classOBJ=MODELS_ORDE.Storeorderid, Serializer=POST_SRLZER_ORDE.Storeorderidserializer,data=prepare_data)
+
+
     userid = request.user.id
     free_delivery = True
     customerid = request.data.get('customer')
@@ -630,9 +753,9 @@ def addorder_auth(request):
                             ##create ordersummary
                             if not response_message:
                                 #invoice auto create
-                                orderitems = MODELS_ORDE.Orderitems.objects.all().order_by('id').last()
+                                last_order_id = MODELS_ORDE.Storeorderid.objects.all().order_by('id').last()
                                 inv_first_serial = 100000
-                                inv_current_serial = inv_first_serial + orderitems.id if orderitems else inv_first_serial + 1
+                                inv_current_serial = inv_first_serial + last_order_id.last_order_id + 1 if last_order_id else inv_first_serial + 1
                                 invoice_no = f'INV{inv_current_serial}'
 
                                 prepare_data={
@@ -658,7 +781,13 @@ def addorder_auth(request):
                                     extra_fields=extra_fields,
                                     required_fields=required_fields
                                 )
-                                
+                                #store last order id
+                                if responsesuccessflag == 'success':
+                                    last_order_id = MODELS_ORDE.Storeorderid.objects.all().order_by('id').last()
+                                    if last_order_id : 
+                                        prepare_data={'last_order_id': responsedata.data['id']}
+                                        ghelp().updaterecord(classOBJ=MODELS_ORDE.Storeorderid, Serializer=POST_SRLZER_ORDE.Storeorderidserializer, id=last_order_id.id,data=prepare_data)
+          
                                 #create orderitems and update product quantity
                                 if responsesuccessflag == 'success':
                                     for productkey in response['products'].keys():

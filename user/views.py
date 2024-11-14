@@ -200,6 +200,7 @@ def adduser(request):
     # userid = request.user.id
     # extra_fields = {}
     # if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
+    if 'username' in requestdata: requestdata['username'] = requestdata['username'].lower()
     if 'password' in requestdata: requestdata['password'] = make_password(requestdata['password'])
     required_fields = ['name', 'address', 'contact_no', 'password', 'username', 'role']
     email = request.data.get('email')
@@ -224,13 +225,14 @@ def adduser(request):
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 @api_view(['PUT'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 # @deco.get_permission(['edit_user'])
 def updateuser(request, uuserid=None):
     requestdata = request.data.copy()
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'updated_by': userid})
+    if 'username' in requestdata: requestdata['username'] = requestdata['username'].lower()
     if 'password' in requestdata: requestdata['password'] = make_password(requestdata['password'])
     allowed_fields=['name', 'address', 'contact_no', 'username', 'email', 'role', 'password']
     # freez_update = [{'user_type': 'Admin'}]  //user type admin paile purai r update korte dibe na

@@ -18,3 +18,8 @@ class Orderitemsserializer(serializers.ModelSerializer):
     class Meta:
         model = models.Orderitems
         fields = ['id', 'ordersummary', 'product', 'order_quantity', 'unit_trade_price', 'unit_mrp']
+
+class Storeorderidserializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Storeorderid
+        fields = '__all__'

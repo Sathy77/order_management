@@ -27,6 +27,8 @@ class RegisterAPI(generics.GenericAPIView):
             'data': {}
             }
         STATUS = status.HTTP_400_BAD_REQUEST
+        if 'username' in request.data:
+            request.data['username'] = request.data['username'].lower()
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
@@ -52,6 +54,7 @@ def login_user(request):
         username = request.data.get('username')
         password = request.data.get('password')
         if username and password:
+            username = username.lower()
             authenticate_user = authenticate(request, username=username, password=password)
             if authenticate_user is not None:
                 user = User.objects.get(username=username)

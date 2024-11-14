@@ -184,7 +184,7 @@ def deleteexpense(request, expenseid=None):
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 # @deco.get_permission(['view_transection'])
 def gettransections(request):
     filter_fields = [

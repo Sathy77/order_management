@@ -5,4 +5,5 @@ from order import models
 admin.site.register([
     models.Ordersummary,
     models.Orderitems,
+    models.Storeorderid,
 ])

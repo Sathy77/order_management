@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/om_settings/', include('om_settings.urls')),
     path('api/dashboard/', include('dashboard.urls')),
     path('api/otp/', include('otp.urls')),
+    path('api/pdf/', include('pdf.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

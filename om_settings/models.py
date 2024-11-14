@@ -7,7 +7,8 @@ def generate_unique_code():
     return ghelp().getUniqueCodePattern()
 
 def uploadcompanylogo(instance, filename):
-    return "files/company/{name}/logo/{uniquecode}uniquevalue{filename}".format(name=instance.company_name, uniquecode=generate_unique_code(), filename=filename)
+    
+    return "files/company/{name}/logo/{uniquecode}uniquevalue{filename}".format(name=instance.company_name.replace(' ', '_'), uniquecode=generate_unique_code(), filename=filename)
 
 class Settings(Basic):
     company_name = models.CharField(max_length=200, blank=True, null=True)

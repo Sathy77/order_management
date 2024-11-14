@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Sheet - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 90px;
+            height: auto;
+            margin-bottom: 6px;
+        }
+        .company-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .address p  {
+            margin: 5px 0;
+            font-size: 14px;
+            text-align: right;
+        }
+        .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .date {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        @page {
+            size: A4;
+            margin: 0.35in;
+            
+            /* Footer content */
+            @bottom-center {
+                content: "Page " counter(page);
+                font-size: 12px;
+                font-family: 'Kalpurush', sans-serif;
+                color: #555;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <img src="{{ logo }}" alt="Company Logo" class="logo" />
+                <div class="company-name">{{ company_name }}</div>
+            </div>
+            <div class="address">
+                <p><b>Address: </b> {{ address }}</p>
+                <p><b>Phone: </b>Phone: {{ phone_number }}</p>
+                <p><b>Email: </b> {{ email }}</p>
+            </div>
+        </div>
+        <div class="titleBox">
+            <div class="title">All Customers</div>
+            <p class="date">Generated on: {{ time_now|date:"M-d-Y, H:i A" }}</p>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact No.</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>{{ customer.name }}</td>
+                    <td>{{ customer.contact_no }}</td>
+                    <td>{{ customer.address }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
