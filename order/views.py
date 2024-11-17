@@ -28,8 +28,8 @@ from otp import models as MODELS_OTP
 # Create your views here.
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_order'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['view_order'])
 def getordersummary(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -73,7 +73,7 @@ def getordersummary(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_order_item'])
+@deco.get_permission(['view_order_item'])
 def getorderitems(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -201,7 +201,6 @@ def getorderitems(request):
 
 
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
 def addorder_noauth(request):
     response_data = {}
     response_message = []
@@ -388,8 +387,8 @@ def addorder_noauth(request):
 
 
 @api_view(['PUT'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_order_status'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['edit_order_status'])
 def updateorderstatus(request, ordersummaryid=None):
     response_data = {}
     response_message = []
@@ -695,8 +694,8 @@ def updateorderstatus(request, ordersummaryid=None):
 
 
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_order'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['create_order'])
 def addorder_auth(request):
     response_data = {}
     response_message = []
@@ -831,7 +830,7 @@ def addorder_auth(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_order'])
+@deco.get_permission(['edit_order'])
 def updateorder_auth(request, ordersummaryid=None):
     response_data = {}
     response_message = []

@@ -145,7 +145,20 @@
 #     response['Content-Disposition'] = 'inline; filename="customers.pdf"'
     
 #     # Set up CSS with embedded Kalpurush font
-   
+#     string="""
+#     @font-face {
+#         font-family: 'Kalpurush';
+#         src: url('font/Kalpurush.ttf') format('truetype');
+#     }
+#     body, p, h1, h2, h3, h4, h5, tr, td {
+#         font-family: 'Kalpurush', Arial, sans-serif;
+#         font-size: 12px;
+#     }
+#     th, h1, h2, h3, b {
+#     font-family: Arial, sans-serif; /* Fallback to a font that supports bold */
+#     font-weight: bold;
+#     }
+#     """
     
 #     pisa_status = pisa.CreatePDF(html_content, dest=response)
 

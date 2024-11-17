@@ -18,7 +18,7 @@ from django.db.models import Q
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_income'])
+@deco.get_permission(['view_income'])
 def getincomes(request):
     if not MODELS_ACCO.Income.objects.all().exists():
         userid = request.user.id
@@ -52,7 +52,7 @@ def getincomes(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_income'])
+@deco.get_permission(['create_income'])
 def addincome(request):
     requestdata = request.data.copy()
     userid = request.user.id
@@ -74,7 +74,7 @@ def addincome(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_income'])
+@deco.get_permission(['edit_income'])
 def updateincome(request, incomeid=None):
     userid = request.user.id
     extra_fields = {}
@@ -91,7 +91,7 @@ def updateincome(request, incomeid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['delete_income'])
+@deco.get_permission(['delete_income'])
 def deleteincome(request, incomeid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_ACCO.Income,
@@ -100,8 +100,8 @@ def deleteincome(request, incomeid=None):
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_expense'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['view_expense'])
 def getexpenses(request):
     if not MODELS_ACCO.Expense.objects.all().exists():
         userid = request.user.id
@@ -136,7 +136,7 @@ def getexpenses(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_expense'])
+@deco.get_permission(['create_expense'])
 def addexpense(request):
     requestdata = request.data.copy()
     userid = request.user.id
@@ -158,7 +158,7 @@ def addexpense(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_expense'])
+@deco.get_permission(['edit_expense'])
 def updateexpense(request, expenseid=None):
     userid = request.user.id
     extra_fields = {}
@@ -175,7 +175,7 @@ def updateexpense(request, expenseid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['delete_expense'])
+@deco.get_permission(['delete_expense'])
 def deleteexpense(request, expenseid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_ACCO.Expense,
@@ -185,7 +185,7 @@ def deleteexpense(request, expenseid=None):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_transection'])
+@deco.get_permission(['view_transection'])
 def gettransections(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -232,7 +232,7 @@ def gettransections(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_transection'])
+@deco.get_permission(['create_transection'])
 def addtransection(request):
     response_data = {}
     response_message = []
@@ -313,7 +313,7 @@ def addtransection(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_transection'])
+@deco.get_permission(['edit_transection'])
 def updatetransection(request, transectionid=None):
     response_data = {}
     response_message = []

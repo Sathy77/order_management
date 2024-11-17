@@ -169,7 +169,7 @@ def deleterole(request, roleid=None):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_user'])
+@deco.get_permission(['view_user'])
 def getusers(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -194,7 +194,7 @@ def getusers(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_user'])
+@deco.get_permission(['create_user'])
 def adduser(request):
     requestdata = request.data.copy()
     # userid = request.user.id
@@ -228,7 +228,7 @@ def adduser(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_user'])
+@deco.get_permission(['edit_user'])
 def updateuser(request, uuserid=None):
     requestdata = request.data.copy()
     userid = request.user.id
@@ -255,7 +255,7 @@ def updateuser(request, uuserid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['delete_user'])
+@deco.get_permission(['delete_user'])
 def deleteuser(request, uuserid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_USER.User,

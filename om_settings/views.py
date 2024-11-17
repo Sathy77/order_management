@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
+from helps.decorators.decorator import CommonDecorator as deco
 from om_settings import models as MODELS_OMSE
 from om_settings.serializer.POST import serializers as POST_SRLZER_OMSE
 from om_settings.serializer.GET import serializers as GET_SRLZER_OMSE
@@ -17,7 +18,7 @@ from PIL import Image
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_setting'])
+@deco.get_permission(['view_setting'])
 def getsettings(request):
     if not MODELS_OMSE.Settings.objects.all().exists():
         demo_logo_path=BASE_DIR / 'media/files/company/default/logo/demo.jpg'
@@ -94,7 +95,7 @@ def getsettings(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_setting'])
+@deco.get_permission(['edit_setting'])
 def updatesetting(request, settingid=None):
     requestdata = dict(request.data)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})

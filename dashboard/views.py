@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from helps.decorators.decorator import CommonDecorator as deco
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Sum, F
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ from django.utils.timezone import now
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_monthly_sales_amount'])
+@deco.get_permission(['view_monthly_sales_amount'])
 def getmonthlysalesamount (request):
     response_data = []
     response_message = []
@@ -47,7 +48,7 @@ def getmonthlysalesamount (request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_monthly_profit'])
+@deco.get_permission(['view_monthly_profit'])
 def getmonthlyprofit (request):
     response_data = []
     response_message = []
@@ -88,7 +89,7 @@ def getmonthlyprofit (request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_monthly_location_wise_sale'])
+@deco.get_permission(['view_monthly_location_wise_sale'])
 def getmonthlylocationwisesale (request):
     response_data = []
     response_message = []
@@ -139,7 +140,7 @@ def getmonthlylocationwisesale (request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_monthly_item_wise_sales'])
+@deco.get_permission(['view_monthly_item_wise_sales'])
 def getmonthlyitemwisesales(request):
     response_data = []
     response_message = []
