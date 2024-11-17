@@ -203,10 +203,12 @@ def adduser(request):
     if 'username' in requestdata: requestdata['username'] = requestdata['username'].lower()
     if 'password' in requestdata: requestdata['password'] = make_password(requestdata['password'])
     required_fields = ['name', 'address', 'contact_no', 'password', 'username', 'role']
-    email = request.data.get('email')
+    email = requestdata.get('email')
+    contact_no = requestdata.get('contact_no')
+    contact_no = '8801' + contact_no[-9:]
     prepare_data={
         'name': requestdata.get('name'),
-        'contact_no': requestdata.get('contact_no'),
+        'contact_no': contact_no,
         'address': requestdata.get('address'),
         'username': requestdata.get('username'),
         'password': requestdata.get('password'),  # Hashed password
@@ -230,6 +232,8 @@ def adduser(request):
 def updateuser(request, uuserid=None):
     requestdata = request.data.copy()
     userid = request.user.id
+    contact_no = requestdata.get('contact_no')
+    contact_no = '8801' + contact_no[-9:]
     extra_fields = {}
     if userid: extra_fields.update({'updated_by': userid})
     if 'username' in requestdata: requestdata['username'] = requestdata['username'].lower()
@@ -319,14 +323,15 @@ def getcustomers(request):
 @permission_classes([IsAuthenticated])
 # @deco.get_permission(['create_customer'])
 def addcustomer(request):
-    name = request.data.get('name')
-    contact_no = request.data.get('contact_no')
-    email = request.data.get('email')
-    address = request.data.get('address')
+    requestdata = request.data.copy()
+    name = requestdata.get('name')
+    contact_no = requestdata.get('contact_no')
+    contact_no = '8801' + contact_no[-9:]
+    email = requestdata.get('email')
+    address = requestdata.get('address')
     password = f'PASS{contact_no}'
     password = make_password(password)
     username = contact_no
-    requestdata = request.data.copy()
     userid = request.user.id
     extra_fields = {}
 
@@ -353,6 +358,8 @@ def addcustomer(request):
 # @deco.get_permission(['edit_customer'])
 def updatecustomer(request, customerid=None):
     userid = request.user.id
+    contact_no = request.data.get('contact_no')
+    contact_no = '8801' + contact_no[-9:]
     extra_fields = {}
     if userid: extra_fields.update({'updated_by': userid})
     allowed_fields=['name', 'address', 'contact_no', 'email']

@@ -28,7 +28,7 @@ from otp import models as MODELS_OTP
 # Create your views here.
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 # @deco.get_permission(['view_order'])
 def getordersummary(request):
     filter_fields = [
@@ -57,6 +57,7 @@ def getordersummary(request):
         {'name': 'total_profit', 'convert': None, 'replace':'total_profit'},
         {'name': 'order_status', 'convert': None, 'replace':'order_status__icontains'},
         {'name': 'payment_status', 'convert': None, 'replace':'payment_status__icontains'},
+        {'name': 'order_note', 'convert': None, 'replace':'order_note__icontains'},
     ]
     ordersummarys = MODELS_ORDE.Ordersummary.objects.filter(**ghelp().KWARGS(request, filter_fields))
 
@@ -234,6 +235,7 @@ def addorder_noauth(request):
                         free_delivery = False
                     
                     todate = date.today()
+                    order_note = requestdata.get('order_note')
                     payment_mode = requestdata.get('payment_mode') ## frontend theke valu dile recive korbe na dile none pathabe
                     if not payment_mode:
                         payment_mode = CHOICE.PAYMENT_MODE[0][0]
@@ -255,6 +257,7 @@ def addorder_noauth(request):
                         if not response['message']:
                             user = MODELS_USER.User.objects.filter(contact_no=contact_no)
                             if not user.exists():
+                                contact_no = '8801' + contact_no[-9:]
                                 allowed_fields = ['name', 'address', 'contact_no', 'email']
                                 extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'created_by': userid, 'updated_by': userid}
                                 required_fields = ['name', 'address', 'contact_no']
@@ -275,6 +278,7 @@ def addorder_noauth(request):
                             else: 
                                 user = user.first()
                                 # userid = request.user.id
+                                contact_no = '8801' + contact_no[-9:]
                                 extra_fields = {}
                                 if userid: extra_fields.update({'updated_by': userid})
                                 allowed_fields=['name', 'address', 'contact_no', 'email']
@@ -319,7 +323,8 @@ def addorder_noauth(request):
                                         'grand_total': grand_total,
                                         'total_profit': total_profit,
                                         'discount': discount,
-                                        'payment_mode': payment_mode
+                                        'payment_mode': payment_mode,
+                                        'order_note': order_note if order_note else ""
                                     } 
                                     required_fields = ['deliveryzone']
                                     responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().addtocolass(
@@ -719,6 +724,7 @@ def addorder_auth(request):
                     free_delivery = False
                 
                 todate = date.today()
+                order_note = requestdata.get('order_note')
                 payment_mode = requestdata.get('payment_mode') ## frontend theke valu dile recive korbe na dile none pathabe
                 if not payment_mode:
                     payment_mode = CHOICE.PAYMENT_MODE[0][0]
@@ -769,7 +775,8 @@ def addorder_auth(request):
                                     'grand_total': grand_total,
                                     'total_profit': total_profit,
                                     'discount': discount_total,
-                                    'payment_mode': payment_mode
+                                    'payment_mode': payment_mode,
+                                    'order_note': order_note if order_note else ""
                                 } 
                                 extra_fields = {}
                                 if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
@@ -880,9 +887,15 @@ def updateorder_auth(request, ordersummaryid=None):
             try: discount_totals += 0
             except: response_message.append('discount_totals should be type of float!')
                 # response_message.append('discounts should be type of float!')
+
+            order = MODELS_ORDE.Ordersummary.objects.get(id=ordersummaryid)
             discounts = requestdata.get('discount')
             if discounts == None:
-                discounts = 0
+                discounts = order.discount
+
+            order_note = requestdata.get('order_note')
+            if order_note == None:
+                order_note = order.order_note
             
             is_fiexd_amounts = requestdata.get('is_fiexd_amount')
             
@@ -1009,7 +1022,8 @@ def updateorder_auth(request, ordersummaryid=None):
                                     'total_profit': total_profit,
                                     'discount': discount_total,
                                     'payment_mode': payment_mode,
-                                    'coupon' : coupons
+                                    'coupon' : coupons,
+                                    'order_note': order_note if order_note else ""
                                 }
                                 allowed_fields=['user', 'deliveryzone', 'product_cost', 'delivery_cost', 'free_delivery', 'grand_total', 'total_profit', 'discount', 'payment_mode', 'coupon']
                                 response_data, response_message, response_successflag, response_status = ghelp().updaterecord(

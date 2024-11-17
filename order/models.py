@@ -24,6 +24,7 @@ class Ordersummary(Basic):
     total_profit = models.FloatField(blank=True, null=True)
     order_status = models.CharField(max_length=25, choices=CHOICE.ORDER_STATUS, default=CHOICE.ORDER_STATUS[0][1])
     payment_status = models.CharField(max_length=25, choices=CHOICE.PAYMENT_STATUS, default=CHOICE.PAYMENT_STATUS[0][1])
+    order_note = models.CharField(max_length=300, blank=True, null=True)
     
     created_by = models.ForeignKey(MODELS_USER.User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordersummary_created_by')
     updated_by = models.ForeignKey(MODELS_USER.User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordersummary_updated_by')

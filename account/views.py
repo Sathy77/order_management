@@ -184,7 +184,7 @@ def deleteexpense(request, expenseid=None):
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 # @deco.get_permission(['view_transection'])
 def gettransections(request):
     filter_fields = [
@@ -204,12 +204,16 @@ def gettransections(request):
     transections = MODELS_ACCO.Transection.objects.filter(**ghelp().KWARGS(request, filter_fields))
     search_term = request.GET.get('search_term')
     heads = request.GET.get('head')
+    order = request.GET.get('order')
     
     if search_term == 'expense':
         transections = MODELS_ACCO.Transection.objects.filter(income__isnull=True)
     
     elif search_term == 'income':
         transections = MODELS_ACCO.Transection.objects.filter(expense__isnull=True)
+
+    if order == 'all':
+        transections = MODELS_ACCO.Transection.objects.filter(ordersummary__isnull=False)
 
     if heads:
         transections = transections.filter(Q(income__title__icontains=heads) | Q(expense__title__icontains=heads))
