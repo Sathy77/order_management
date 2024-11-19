@@ -1,8 +1,6 @@
-from django.shortcuts import render, get_object_or_404
+from helps.decorators.decorator import CommonDecorator as deco
 from django.http import HttpResponse
 from django.utils import timezone
-# from weasyprint import HTML
-# from weasyprint.css import CSS
 from helps.common.generic import Generichelps as ghelp
 from order import models as MODELS_ORDE
 from om_settings import models as MODELS_SETT
@@ -13,14 +11,13 @@ from django.template.loader import get_template
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
-# from xhtml2pdf import pisa  # Import pisa for xhtml2pdf
 from rest_framework.permissions import IsAuthenticated
 import asyncio
 from playwright.sync_api import sync_playwright
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['order_report_view'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['order_report_view'])
 def get_orders_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
@@ -54,7 +51,6 @@ def get_orders_pdf(request):
         logo_url = request.build_absolute_uri(settings.logo.url)
     else:
         logo_url = ''
-
 
     context = {
         'orders': orders,
@@ -99,8 +95,8 @@ def get_orders_pdf(request):
 
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['customer_report_view'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['customer_report_view'])
 def get_customers_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
@@ -128,8 +124,6 @@ def get_customers_pdf(request):
         logo_url = request.build_absolute_uri(settings.logo.url)
     else:
         logo_url = ''
-
-
     context = {
         'customers': customers,
         'time_now': time_now,
@@ -173,8 +167,8 @@ def get_customers_pdf(request):
     return response
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['transection_report_view'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['transection_report_view'])
 def get_transections_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
@@ -286,17 +280,14 @@ def get_transections_pdf(request):
     return response
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['product_report_view'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['product_report_view'])
 def get_products_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
-        # {'name': 'name', 'convert': None, 'replace':'name__icontains'},
         {'name': 'weight', 'convert': None, 'replace':'weight'},
         {'name': 'quntity', 'convert': None, 'replace':'quntity'},
-        # {'name': 'costprice', 'convert': None, 'replace':'costprice'},
-        # {'name': 'mrpprice', 'convert': None, 'replace':'mrpprice'}
     ]
 
     products = MODELS_PROD.Product.objects.filter(**ghelp().KWARGS(request, filter_fields))
