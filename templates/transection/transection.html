@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Transection Sheet - {{ site_name }}</title>
+    <title></title>
     <style>
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('{request.build_absolute_uri("/static/fonts/Kalpurush.ttf")}') format('truetype');
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, 'Kalpurush', sans-serif;
             margin: 0;
             padding: 20px;
         }
@@ -14,9 +18,19 @@
             width: 100%;
         }
         .header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display:flex;
+            background: white;
+            padding: 10px 20px;
+            z-index: 1000;
+        }
+        .clogo, .address {
+            width:49%;
+        }
+        .titleBox {
+            margin-top: 100px;
         }
         .logo {
             width: 90px;
@@ -30,7 +44,7 @@
         .address p  {
             margin: 5px 0;
             font-size: 14px;
-            text-align: right;
+            text-align: right;            
         }
         .title {
             text-align: center;
@@ -44,15 +58,15 @@
             margin-bottom: 20px;
         }
         table {
-        width: 100%;
-        border-collapse: collapse;
+            width: 100%;
+            border-collapse: collapse;
         }
-        th,
-        td {
+        th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
             font-size: 12px;
+            
         }
         th {
             background-color: #f2f2f2;
@@ -61,27 +75,16 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        .bold {
-        font-weight: bold;
-        }
         @page {
             size: A4;
             margin: 0.35in;
-            
-            /* Footer content */
-            @bottom-center {
-                content: "Page " counter(page);
-                font-size: 12px;
-                font-family: 'Kalpurush', sans-serif;
-                color: #555;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div>
+            <div class="clogo">
                 <img src="{{ logo }}" alt="Company Logo" class="logo" />
                 <div class="company-name">{{ company_name }}</div>
             </div>
@@ -92,47 +95,62 @@
             </div>
         </div>
         <div class="titleBox">
-            <div class="title">All Transections</div>
+            <div class="title">All Orders</div>
             <p class="date">Generated on: {{ time_now|date:"M-d-Y, H:i A" }}</p>
         </div>
         <table>
             <thead>
                 <tr>
+                    <th>Sl.</th>
                     <th>Date</th>
                     <th>Description</th>
+                    {% if income_total_amount > 0 %}
                     <th>Income</th>
+                    {% endif %}
+                    {% if expense_total_amount > 0 %}
                     <th>Expense</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for transection in transections %}
                 <tr>
+                    <td>{{ forloop.counter }}</td>
                     <td>{{ transection.date }}</td>
                     <td>
                         {% if transection.reference %}
-                            <b>Reference: </b>  {{ transection.reference }}<br>
+                            <b>Reference: </b> {{ transection.reference }}<br>
                         {% endif %}
-                        
                         {% if transection.ordersummary.invoice_no %}
                             <b>Invoice No: </b> {{ transection.ordersummary.invoice_no }}<br>
                         {% endif %}
-                        
                         {% if transection.ordersummary.user.name %}
                             <b>Customer Name: </b> {{ transection.ordersummary.user.name }}
                         {% endif %}
                     </td>
+                    {% if income_total_amount > 0 %}
                     <td>{{ transection.amount }}</td>
+                    {% endif %}
+                    {% if expense_total_amount > 0 %}
                     <td>{{ transection.amount }}</td>
+                    {% endif %}
+                    
                 </tr>
                 {% endfor %}
                 <tr>
+                    <td></td>
                     <td><b>Total</b></td>
                     <td></td>
-                    <td>{{income_total_amount}}</td>
-                    <td>{{ expense_total_amount}}</td>
+                    {% if income_total_amount > 0 %}
+                    <td>{{ income_total_amount }}</td>
+                    {% endif %}
+                    {% if expense_total_amount > 0 %}
+                    <td>{{ expense_total_amount }}</td>
+                    {% endif %}
                 </tr>
             </tbody>
         </table>
+        
     </div>
 </body>
 </html>
