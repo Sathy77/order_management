@@ -639,54 +639,66 @@ def updateorderstatus(request, ordersummaryid=None):
                     if new_payment_status in [CHOICE.PAYMENT_STATUS[1][1], CHOICE.PAYMENT_STATUS[2][1]]: #new partial / recive
                         #update income
                         if incomeid:
+                            amount = 0
                             if new_payment_status == CHOICE.PAYMENT_STATUS[1][1]: #new partial
                                 partial_amount = requestdata.get('partial_amount')
-                                amount = partial_amount
-                            else: amount = grand_total
+                                if partial_amount:
+                                    if partial_amount < grand_total:
+                                        amount = partial_amount
+                                    elif partial_amount == grand_total:
+                                        amount = grand_total
+                                        new_payment_status = CHOICE.PAYMENT_STATUS[2][1]
+
+                                    else: response_message.append(f"({partial_amount}) is greater than ({grand_total})")
+                            else: 
+                                amount = grand_total
+                                new_payment_status = CHOICE.PAYMENT_STATUS[2][1]
                             income_balance = income.first().balance
                             if amount:
                                 income_balance = income_balance + amount
                             else :
                                 partial_amount = 0
                                 income_balance = income_balance + amount
-                            
-                            extra_fields = {}
-                            if userid: extra_fields.update({'updated_by': userid})
-                            prepare_data={'balance': income_balance}
-                            responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().updaterecord(
-                                classOBJ=MODELS_ACCO.Income, 
-                                Serializer=POST_SRLZER_ACCO.Incomeserializer, 
-                                id=incomeid,
-                                data=prepare_data,
-                                extra_fields=extra_fields
-                            )
-                            response_data = responsedata.data if responsesuccessflag == 'success' else {}
-                            #create transiction
-                            if responsesuccessflag == 'success':
-                                todate = date.today()
-                                required_fields = ['date', 'amount']
-                                # fields_regex = [{'field': 'date', 'type': 'date'}]
-                                prepare_data={'income': incomeid, 'ordersummary': ordersummaryid, 'date': todate, 'amount': amount}
-                                response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
-                                    classOBJ=MODELS_ACCO.Transection, 
-                                    Serializer=POST_SRLZER_ACCO.Transectionserializer, 
-                                    data=prepare_data, 
-                                    # fields_regex=fields_regex, 
-                                    required_fields=required_fields,
+                            if not response_message:
+                                extra_fields = {}
+                                if userid: extra_fields.update({'updated_by': userid})
+                                prepare_data={'balance': income_balance}
+                                responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().updaterecord(
+                                    classOBJ=MODELS_ACCO.Income, 
+                                    Serializer=POST_SRLZER_ACCO.Incomeserializer, 
+                                    id=incomeid,
+                                    data=prepare_data,
+                                    extra_fields=extra_fields
                                 )
-                                if response_data: response_data = response_data.data
-                                #update order payment status
-                                if response_successflag=='success':
-                                    prepare_data={'payment_status': new_payment_status}
-                                    response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
-                                        classOBJ=MODELS_ORDE.Ordersummary, 
-                                        Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
-                                        id=ordersummaryid,
-                                        data=prepare_data
+                                response_data = responsedata.data if responsesuccessflag == 'success' else {}
+                                #create transiction
+                                if responsesuccessflag == 'success':
+                                    todate = date.today()
+                                    required_fields = ['date', 'amount']
+                                    # fields_regex = [{'field': 'date', 'type': 'date'}]
+                                    prepare_data={'income': incomeid, 'ordersummary': ordersummaryid, 'date': todate, 'amount': amount}
+                                    response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
+                                        classOBJ=MODELS_ACCO.Transection, 
+                                        Serializer=POST_SRLZER_ACCO.Transectionserializer, 
+                                        data=prepare_data, 
+                                        # fields_regex=fields_regex, 
+                                        required_fields=required_fields,
                                     )
-                                    response_data = response_data.data if response_successflag == 'success' else {}
+                                    if response_data: response_data = response_data.data
+                                    #update order payment status
+                                    if response_successflag=='success':
+                                        prepare_data={'payment_status': new_payment_status}
+                                        response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+                                            classOBJ=MODELS_ORDE.Ordersummary, 
+                                            Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 
+                                            id=ordersummaryid,
+                                            data=prepare_data
+                                        )
+                                        response_data = response_data.data if response_successflag == 'success' else {}
         else: response_message.append("order summary dose/'t exist!")
     else: response_message.append('order_status is required!')
+    if response_message:
+        response_successflag = 'error'
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 
