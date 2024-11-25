@@ -215,6 +215,7 @@ def addorder_noauth(request):
         ghelp().addtocolass(classOBJ=MODELS_ORDE.Storeorderid, Serializer=POST_SRLZER_ORDE.Storeorderidserializer,data=prepare_data)
 
     contact_no = request.data.get('contact_no')
+    contact_no = '8801' + contact_no[-9:]
     otp = request.data.get('otp')
     if contact_no and otp:
         otp_message = sendotp.verify_otp(contact_no , otp)
@@ -255,10 +256,12 @@ def addorder_noauth(request):
                         response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
                         if not response['message']:
                             user = MODELS_USER.User.objects.filter(contact_no=contact_no)
+                            print(user)
+                            print( not user.exists())
                             if not user.exists():
                                 contact_no = '8801' + contact_no[-9:]
                                 allowed_fields = ['name', 'address', 'contact_no', 'email']
-                                extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'created_by': userid, 'updated_by': userid}
+                                extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1], 'created_by': userid, 'updated_by': userid}
                                 required_fields = ['name', 'address', 'contact_no']
                                 fields_regex = [{'field': 'contact_no', 'type': 'phonenumber'}]
                                 unique_fields=['contact_no']
@@ -274,10 +277,12 @@ def addorder_noauth(request):
                                 )
                                 if responsesuccessflag == 'success': user = responsedata.instance
                                 elif responsesuccessflag == 'error': response_message.extend(responsemessage)
-                            else: 
+                            if user.exists(): 
                                 user = user.first()
+                                userid = user.id
                                 # userid = request.user.id
                                 contact_no = '8801' + contact_no[-9:]
+                                request.data['contact_no'] = contact_no
                                 extra_fields = {}
                                 if userid: extra_fields.update({'updated_by': userid})
                                 allowed_fields=['name', 'address', 'contact_no', 'email']

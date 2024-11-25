@@ -337,7 +337,7 @@ def addcustomer(request):
 
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
     # if 'password' in requestdata: requestdata['password'] = make_password(password)
-    prepare_data={'name': name, 'contact_no': contact_no, 'address': address, 'username': username, 'password': password, 'email': email if email else ""}
+    prepare_data={'name': name, 'contact_no': contact_no, 'address': address, 'username': username, 'password': password, 'user_type': CHOICE.USER_TYPE[1][1], 'email': email if email else ""}
     # if email:
     #     prepare_data={'name': name, 'contact_no': contact_no, 'address': address, 'username': username, 'password': password, 'email': email}
     

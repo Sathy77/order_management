@@ -446,6 +446,54 @@ def updatetransection(request, transectionid=None):
         if isinstance(response_data, POST_SRLZER_ACCO.Transectionserializer):
             response_data = response_data.data
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['delete_transection'])
+def deletetransection(request, transectionid=None):
+    userid = request.user.id
+    transection = MODELS_ACCO.Transection.objects.filter(id=transectionid)
+    amount = transection.first().amount
+    incomeid = transection.first().income.id if transection.first() and transection.first().income else None
+    expenseid = transection.first().expense.id if transection.first() and transection.first().expense else None
+    if incomeid:
+        income = MODELS_ACCO.Income.objects.filter(id=incomeid).first()
+        balance = income.balance
+        balance -= amount
+        prepare_data={'balance': balance}
+        extra_fields = {}
+        if userid: extra_fields.update({'updated_by': userid})
+        response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+            classOBJ=MODELS_ACCO.Income, 
+            Serializer=POST_SRLZER_ACCO.Incomeserializer, 
+            id=incomeid,
+            data=prepare_data,
+            extra_fields=extra_fields
+        )
+        response_data = response_data.data if response_successflag == 'success' else {}
+    elif expenseid:
+        expense = MODELS_ACCO.Expense.objects.filter(id=expenseid).first()
+        balance = expense.balance
+        balance -= amount
+        prepare_data={'balance': balance}
+        extra_fields = {}
+        if userid: extra_fields.update({'updated_by': userid})
+        response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
+            classOBJ=MODELS_ACCO.Expense, 
+            Serializer=POST_SRLZER_ACCO.Expenseserializer, 
+            id=expenseid,
+            data=prepare_data,
+            extra_fields=extra_fields
+        )
+        response_data = response_data.data if response_successflag == 'success' else {}
+    if response_successflag == 'success':
+        response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
+            classOBJ=MODELS_ACCO.Transection,
+            id=transectionid
+        )
+    return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
+
+
 ##    
 # @api_view(['POST'])
 # @permission_classes([IsAuthenticated])

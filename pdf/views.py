@@ -8,11 +8,9 @@ from account import models as MODELS_ACCO
 from user import models as MODELS_USER
 from product import models as MODELS_PROD
 from django.template.loader import get_template
-from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
-import asyncio
 from playwright.sync_api import sync_playwright
 
 @api_view(['GET'])

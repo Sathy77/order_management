@@ -15,6 +15,7 @@ urlpatterns = [
     path('get-transection/', views.gettransections, name='get-transection'),
     path('add-transection/', views.addtransection, name='add-transection'),
     path('update-transection/<int:transectionid>', views.updatetransection, name='update-transection'),
+    path('delete-transection/<int:transectionid>', views.deletetransection, name='delete-transection'),
 
     # path('add-transection-expense/', views.addtransectionexpense, name='add-transection-expense'),
     

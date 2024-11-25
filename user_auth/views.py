@@ -29,6 +29,7 @@ class RegisterAPI(generics.GenericAPIView):
         STATUS = status.HTTP_400_BAD_REQUEST
         if 'username' in request.data:
             request.data['username'] = request.data['username'].lower()
+        
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
