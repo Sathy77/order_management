@@ -205,7 +205,8 @@ def adduser(request):
     required_fields = ['name', 'address', 'contact_no', 'password', 'username', 'role']
     email = requestdata.get('email')
     contact_no = requestdata.get('contact_no')
-    contact_no = '8801' + contact_no[-9:]
+    if contact_no:
+        contact_no = '8801' + contact_no[-9:]
     prepare_data={
         'name': requestdata.get('name'),
         'contact_no': contact_no,
@@ -233,7 +234,8 @@ def updateuser(request, uuserid=None):
     requestdata = request.data.copy()
     userid = request.user.id
     contact_no = requestdata.get('contact_no')
-    contact_no = '8801' + contact_no[-9:]
+    if contact_no: 
+        contact_no = '8801' + contact_no[-9:]
     extra_fields = {}
     if userid: extra_fields.update({'updated_by': userid})
     if 'username' in requestdata: requestdata['username'] = requestdata['username'].lower()
@@ -326,7 +328,8 @@ def addcustomer(request):
     requestdata = request.data.copy()
     name = requestdata.get('name')
     contact_no = requestdata.get('contact_no')
-    contact_no = '8801' + contact_no[-9:]
+    if contact_no:
+        contact_no = '8801' + contact_no[-9:]
     email = requestdata.get('email')
     address = requestdata.get('address')
     password = f'PASS{contact_no}'
