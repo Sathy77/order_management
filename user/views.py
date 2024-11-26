@@ -282,7 +282,7 @@ def deleteuser(request, uuserid=None):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_customer'])
+@deco.get_permission(['view_customer'])
 def getcustomers(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -321,7 +321,7 @@ def getcustomers(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_customer'])
+@deco.get_permission(['create_customer'])
 def addcustomer(request):
     requestdata = request.data.copy()
     name = requestdata.get('name')
@@ -355,11 +355,14 @@ def addcustomer(request):
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_customer'])
+@deco.get_permission(['edit_customer'])
 def updatecustomer(request, customerid=None):
     userid = request.user.id
+    requestdata = request.data
     contact_no = request.data.get('contact_no')
-    contact_no = '8801' + contact_no[-9:]
+    if contact_no:
+        contact_no = '8801' + contact_no[-9:]
+        requestdata.update({'contact_no': contact_no})
     extra_fields = {}
     if userid: extra_fields.update({'updated_by': userid})
     allowed_fields=['name', 'address', 'contact_no', 'email']
@@ -368,7 +371,7 @@ def updatecustomer(request, customerid=None):
         classOBJ=MODELS_USER.User, 
         Serializer=POST_SRLZER_USER.Userserializer, 
         id=customerid,
-        data=request.data,
+        data=requestdata,
         allowed_fields = allowed_fields,
         unique_fields=['contact_no'],
         # freez_update=freez_update,
@@ -379,7 +382,7 @@ def updatecustomer(request, customerid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['delete_customer'])
+@deco.get_permission(['delete_customer'])
 def deletecustomer(request, customerid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_USER.User,

@@ -218,6 +218,7 @@ def addorder_noauth(request):
     contact_no = '8801' + contact_no[-9:]
     otp = request.data.get('otp')
     if contact_no and otp:
+        requestdata.update({'contact_no': contact_no})
         otp_message = sendotp.verify_otp(contact_no , otp)
 
         if otp_message['flag']:
@@ -255,7 +256,7 @@ def addorder_noauth(request):
                     if not response_message:
                         response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
                         if not response['message']:
-                            user = MODELS_USER.User.objects.filter(contact_no=contact_no)
+                            user = MODELS_USER.User.objects.filter(contact_no__icontains=contact_no)
                             if not user.exists():
                                 allowed_fields = ['name', 'address', 'contact_no', 'email']
                                 extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1], 'created_by': userid, 'updated_by': userid}
