@@ -256,10 +256,7 @@ def addorder_noauth(request):
                         response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
                         if not response['message']:
                             user = MODELS_USER.User.objects.filter(contact_no=contact_no)
-                            print(user)
-                            print( not user.exists())
                             if not user.exists():
-                                contact_no = '8801' + contact_no[-9:]
                                 allowed_fields = ['name', 'address', 'contact_no', 'email']
                                 extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1], 'created_by': userid, 'updated_by': userid}
                                 required_fields = ['name', 'address', 'contact_no']
@@ -277,11 +274,8 @@ def addorder_noauth(request):
                                 )
                                 if responsesuccessflag == 'success': user = responsedata.instance
                                 elif responsesuccessflag == 'error': response_message.extend(responsemessage)
-                            if user.exists(): 
+                            elif user.exists(): 
                                 user = user.first()
-                                userid = user.id
-                                # userid = request.user.id
-                                contact_no = '8801' + contact_no[-9:]
                                 request.data['contact_no'] = contact_no
                                 extra_fields = {}
                                 if userid: extra_fields.update({'updated_by': userid})
