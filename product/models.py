@@ -2,6 +2,7 @@ from django.db import models
 from helps.abstract.abstractclass import Basic
 from django.core.validators import MinValueValidator, MaxValueValidator
 from helps.common.generic import Generichelps as ghelp
+from helps.choice import common as CHOICE
 from user import models as MODELS_USER
 
 # Create your models here.
@@ -13,6 +14,8 @@ def upload_product_photo(instance, filename):
     return "product/photo/{uniquecode}uniquevalue{filename}".format(uniquecode=generate_unique_code(), filename=filename)
 
 class Product(Basic):
+    type = models.CharField(max_length=25, choices=CHOICE.TYPE, default=CHOICE.TYPE[0][1])
+    capacity =  models.IntegerField(validators=[MinValueValidator(0)], default=0)
     name  = models.CharField(max_length=200, blank=True, null=True)
     photo = models.ImageField(upload_to=upload_product_photo, blank=True, null=True)
     gallery = models.CharField(max_length=200, blank=True, null=True)

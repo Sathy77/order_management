@@ -52,7 +52,39 @@ class Generichelps(Minihelps):
             else: response['message'].append('products type should be list!')
         else: response['message'].append('products list is required!')
         return response
-    
+
+    def calculateComboBoxCalculationauth(self,combobox, combo_quantity, products, discount, is_fiexd_amounts, deliverycost):
+        product_cost = 0
+        trade_cost = 0
+
+        combobox_unit_mrp = combobox.first().mrpprice
+        total_combobox_mrp = combobox_unit_mrp*combo_quantity
+        combobox_unit_cost = combobox.first().costprice
+        total_combobox_cost = combobox_unit_cost*combo_quantity
+        
+        for productkey in products.keys():
+            product = products[productkey]['product']
+            order_quantity = products[productkey]['quantity']
+
+            unit_trade_price = product.first().costprice
+            unit_mrp = product.first().mrpprice
+
+            product_cost +=  unit_mrp*order_quantity
+            trade_cost += unit_trade_price*order_quantity
+        # product_cost -= discount
+        if is_fiexd_amounts:
+            discount_total = discount
+            # product_cost -= discount_total
+                   
+        else:
+            discount_total = product_cost * discount/100
+        
+        grand_total = product_cost + deliverycost + total_combobox_mrp
+        grand_total -= discount_total
+        product_cost += total_combobox_mrp
+        trade_cost += total_combobox_cost
+        total_profit = (product_cost - discount_total ) - trade_cost
+        return product_cost, grand_total, total_profit, discount_total    
 
     # ORDER
     def calculateProductCalculation(self, products, discount, deliverycost):

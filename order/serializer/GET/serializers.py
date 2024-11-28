@@ -9,7 +9,7 @@ class Ordersummaryserializer(serializers.ModelSerializer):
     deliveryzone = GET_SRLZER_ZONE.Deliveryzoneserializer()
     class Meta:
         model = models.Ordersummary
-        fields = ['id', 'user', 'date', 'invoice_no', 'deliveryzone', 'payment_mode', 'product_cost', 'coupon', 'discount', 'free_delivery', 'grand_total', 'total_profit', 'order_status']
+        fields = ['id', 'user', 'date', 'invoice_no', 'deliveryzone', 'payment_mode', 'product_cost', 'coupon', 'discount', 'free_delivery', 'grand_total', 'total_profit', 'order_status', 'is_combo', 'combo_name', 'combo_quantity']
 
 
 class Orderitemsserializer(serializers.ModelSerializer):

@@ -228,6 +228,8 @@ class Picohelps:
    def getProductData(self):
       return {
                'fieldlist': [
+                  {'field': 'type', 'type': 'str'},
+                  {'field': 'capacity', 'type': 'int'},           
                   {'field': 'name', 'type': 'str'},
                   {'field': 'photo', 'type': 'str'},
                   {'field': 'gallery', 'type': 'str'},

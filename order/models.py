@@ -25,6 +25,9 @@ class Ordersummary(Basic):
     order_status = models.CharField(max_length=25, choices=CHOICE.ORDER_STATUS, default=CHOICE.ORDER_STATUS[0][1])
     payment_status = models.CharField(max_length=25, choices=CHOICE.PAYMENT_STATUS, default=CHOICE.PAYMENT_STATUS[0][1])
     order_note = models.CharField(max_length=300, blank=True, null=True)
+    is_combo = models.BooleanField(default=False)
+    combo_name = models.CharField(max_length=200, blank=True, null=True)
+    combo_quantity = models.IntegerField(default=0)
     
     created_by = models.ForeignKey(MODELS_USER.User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordersummary_created_by')
     updated_by = models.ForeignKey(MODELS_USER.User, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordersummary_updated_by')

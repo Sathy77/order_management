@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_nested_forms.utils import NestedForm
 from django.db.models import Q
 from helps.decorators.decorator import CommonDecorator as deco
+from helps.choice import common as CHOICE
 
 # Create your views here.
 
@@ -46,7 +47,14 @@ def getproducts_noauth(request):
 @permission_classes([IsAuthenticated])
 @deco.get_permission(['create_product'])
 def addproduct(request):
-    requestdata = dict(request.data)
+    requestdata = request.data.copy()
+    types = requestdata.get('type')
+    if types:
+        if types == CHOICE.TYPE[2][1]:
+            requestdata['mrpprice'] = '0'
+        elif types == CHOICE.TYPE[0][1]:
+            requestdata['capacity'] = '0'
+    requestdata = dict(requestdata)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
     options = {'allow_blank': True, 'allow_empty': False}
     form = NestedForm(requestdata, **options)
@@ -55,7 +63,7 @@ def addproduct(request):
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
-    required_fields = ['name', 'photo', 'weight', 'quntity', 'costprice', 'mrpprice']
+    required_fields = ['type', 'capacity', 'name', 'photo', 'weight', 'quntity', 'costprice', 'mrpprice']
     response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
         classOBJ=MODELS_PROD.Product, 
         Serializer=POST_SRLZER_PROD.Productserializer, 
@@ -71,7 +79,14 @@ def addproduct(request):
 @permission_classes([IsAuthenticated])
 @deco.get_permission(['edit_product'])
 def updateproduct(request, productid=None):
-    requestdata = dict(request.data)
+    requestdata = request.data.copy()
+    types = requestdata.get('type')
+    if types:
+        if types == CHOICE.TYPE[2][1]:
+            requestdata['mrpprice'] = '0'
+        elif types == CHOICE.TYPE[0][1]:
+            requestdata['capacity'] = '0'
+    requestdata = dict(requestdata)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
     options = {'allow_blank': True, 'allow_empty': False}
     form = NestedForm(requestdata, **options)

@@ -17,6 +17,12 @@ PAYMENT_STATUS = (
     ('Partial Received', 'Partial Received'), 
     ('Received', 'Received'),
 )
+
+TYPE = (
+    ('product','product'),
+    ('gift-box', 'gift-box'), 
+    ('general-box', 'general-box'),
+)
 BLOOD_GROUP = (
     ('A+', 'A+'),
     ('A-', 'A-'),
