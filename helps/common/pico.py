@@ -113,25 +113,6 @@ class Picohelps:
                kwargs.update({field['replace']: field_value})
       return kwargs
    
-   # def SEARCH_TERM(self, request, filter_fields):
-   #    kwargs = {}
-   #    search_term=request.GET.get('search_term')
-   #    if search_term != None:
-   #       field_value=request.GET.get(search_term)
-   #       if field_value != None:
-   #          for field in filter_fields:
-   #             if search_term == field['name']:
-   #                if field['convert'] == 'bool':
-   #                   if field_value in ['TRUE', 'True', 'true', '1']: field_value = True
-   #                   else: field_value = False
-   #                if field['convert'] == 'list-str':
-   #                   if 'split' in field_value:
-   #                      splitsign = field_value['split']
-   #                      field_value = field_value.split(splitsign)
-   #                kwargs.update({field['replace']: field_value})
-   #    return kwargs
-   
-
    def findGeneralsettings(self, Generalsettings): # New
       generalsetting = Generalsettings.objects.all()
       if generalsetting:
@@ -191,39 +172,6 @@ class Picohelps:
          'datetime': {'regex': '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$', 'format': '2024-01-01 15:12:13'},
       }
       return regexs.get(retype)
-   
-   # def prepareUserObjInfo(self, personalDetails, officialDetails, salaryAndLeaves):
-   #    return [
-   #          {'field': 'first_name', 'replace': 'first_name', 'obj': personalDetails},
-   #          {'field': 'last_name', 'replace': 'last_name', 'obj': personalDetails},
-   #          {'field': 'gender', 'replace': 'gender', 'obj': personalDetails},
-   #          {'field': 'dob', 'replace': 'dob', 'obj': personalDetails},
-   #          {'field': 'blood_group', 'replace': 'blood_group', 'obj': personalDetails},
-   #          {'field': 'fathers_name', 'replace': 'fathers_name', 'obj': personalDetails},
-   #          {'field': 'mothers_name', 'replace': 'mothers_name', 'obj': personalDetails},
-   #          {'field': 'marital_status', 'replace': 'marital_status', 'obj': personalDetails},
-   #          {'field': 'spouse_name', 'replace': 'spouse_name', 'obj': personalDetails},
-   #          {'field': 'nationality', 'replace': 'nationality', 'obj': personalDetails},
-   #          {'field': 'personal_email', 'replace': 'personal_email', 'obj': personalDetails},
-   #          {'field': 'personal_phone', 'replace': 'personal_phone', 'obj': personalDetails},
-   #          {'field': 'nid_passport_no', 'replace': 'nid_passport_no', 'obj': personalDetails},
-   #          {'field': 'tin_no', 'replace': 'tin_no', 'obj': personalDetails},
-   #          {'field': 'official_id', 'replace': 'official_id', 'obj': officialDetails},
-   #          {'field': 'official_email', 'replace': 'official_email', 'obj': officialDetails},
-   #          {'field': 'official_phone', 'replace': 'official_phone', 'obj': officialDetails},
-   #          {'field': 'official_id', 'replace': 'username', 'obj': officialDetails},
-   #          {'field': 'password', 'replace': 'password', 'obj': officialDetails},
-   #          {'field': 'allow_overtime', 'replace': 'allow_overtime', 'obj': officialDetails},
-   #          {'field': 'allow_remote_checkin', 'replace': 'allow_remote_checkin', 'obj': officialDetails},
-   #          {'field': 'active_dummy_salary', 'replace': 'active_dummy_salary', 'obj': officialDetails},
-   #          {'field': 'employee_type', 'replace': 'employee_type', 'obj': officialDetails},
-   #          {'field': 'official_note', 'replace': 'official_note', 'obj': officialDetails},
-   #          {'field': 'joining_date', 'replace': 'joining_date', 'obj': officialDetails},
-   #          {'field': 'job_status', 'replace': 'job_status', 'obj': officialDetails},
-   #          {'field': 'rfid', 'replace': 'rfid', 'obj': officialDetails},
-   #          {'field': 'payment_in', 'replace': 'payment_in', 'obj': salaryAndLeaves},
-   #          {'field': 'gross_salary', 'replace': 'gross_salary', 'obj': salaryAndLeaves},
-   #      ]
    
    def getProductData(self):
       return {

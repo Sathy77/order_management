@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -9,8 +8,7 @@ from rest_framework.response import Response
 from account import models as MODELS_ACCO
 from zone import models as MODELS_ZONE
 from order import models as MODELS_ORDE
-from product import models as MODELS_PROD
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.utils.timezone import now
 
 # Create your views here.
@@ -134,8 +132,7 @@ def getmonthlylocationwisesale (request):
                 response_data.append(per_month)
             else: 
                 per_month={'zone_name': zonename, 'sales': zone}
-                response_data.append(per_month)
-                    
+                response_data.append(per_month)                    
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 @api_view(['GET'])

@@ -53,9 +53,3 @@ class CommonDecorator:
             else:
                 return view_func(request, *args, **kwargs)
         return wrapper_func
-    
-    # def param_decorator(*args, **kwargs):
-    #     def inner(func):
-    #         print("-------------------------------- ", kwargs)
-    #         func()    
-    #     return inner

@@ -4,7 +4,6 @@ from helps.decorators.decorator import CommonDecorator as deco
 from account import models as MODELS_ACCO
 from account.serializer.GET import serializers as GET_SRLZER_ACCO
 from account.serializer.POST import serializers as POST_SRLZER_ACCO
-# from payroll.serializer.POST import serializers as PSRLZER_PAYR
 from helps.common.generic import Generichelps as ghelp
 from rest_framework.response import Response
 from helps.choice import common as CHOICE
@@ -59,7 +58,6 @@ def addincome(request):
     extra_fields = {}
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
     required_fields = ['title', 'balance']
-    # fields_regex = [{'field': 'date', 'type': 'date'}, {'field': 'in_time', 'type': 'time'}, {'field': 'out_time', 'type': 'time'}]
     response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
         classOBJ=MODELS_ACCO.Income, 
         Serializer=POST_SRLZER_ACCO.Incomeserializer, 
@@ -492,60 +490,4 @@ def deletetransection(request, transectionid=None):
             id=transectionid
         )
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
-
-
-##    
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# # @deco.get_permission(['add transection expense', 'all'])
-# def addtransectionexpense(request):
-#     response_data = {}
-#     response_message = []
-#     response_successflag = 'error'
-#     response_status = status.HTTP_400_BAD_REQUEST
-
-#     userid = request.user.id
-#     requestdata = request.data.copy()
-#     expenseid = requestdata.get('expense')
-
-#     if expenseid:
-#         expense = MODELS_ACCO.Expense.objects.filter(id=expenseid)
-#         if expense.exists():
-#             expense_balance = expense.first().balance
-#             amount = requestdata.get('amount')
-#             if amount:
-#                 expense_balance = expense_balance + amount
-#             else :
-#                 amount = 0
-#                 expense_balance = expense_balance + amount
-            
-#             extra_fields = {}
-#             if userid: extra_fields.update({'updated_by': userid})
-#             prepare_data={'balance': expense_balance}
-#             responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().updaterecord(
-#                 classOBJ=MODELS_ACCO.Expense, 
-#                 Serializer=POST_SRLZER_ACCO.Expenseserializer, 
-#                 id=expenseid,
-#                 data=prepare_data,
-#                 extra_fields=extra_fields
-#             )
-#             response_data = responsedata.data if responsesuccessflag == 'success' else {}
-
-#             response_successflag = responsesuccessflag
-
-#             if response_successflag == 'success':
-#                 required_fields = ['expense','date', 'amount']
-#                 fields_regex = [{'field': 'date', 'type': 'date'}]
-#                 response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
-#                     classOBJ=MODELS_ACCO.Transectionexpense, 
-#                     Serializer=POST_SRLZER_ACCO.Transectionexpenseserializer, 
-#                     data=requestdata, 
-#                     unique_fields=[], 
-#                     fields_regex=fields_regex, 
-#                     required_fields=required_fields
-#                 )
-#                 if response_data: response_data = response_data.data
-#         else: response_message.append('Income id is invalid!')
-#     else: response_message.append('Income id is required!')
-#     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 

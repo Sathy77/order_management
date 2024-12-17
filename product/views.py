@@ -18,11 +18,9 @@ from helps.choice import common as CHOICE
 def getproducts_noauth(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
-        # {'name': 'name', 'convert': None, 'replace':'name__icontains'},
         {'name': 'weight', 'convert': None, 'replace':'weight'},
         {'name': 'quntity', 'convert': None, 'replace':'quntity'},
-        # {'name': 'costprice', 'convert': None, 'replace':'costprice'},
-        # {'name': 'mrpprice', 'convert': None, 'replace':'mrpprice'}
+        {'name': 'type', 'convert': None, 'replace':'type__icontains'},
     ]
 
     products = MODELS_PROD.Product.objects.filter(**ghelp().KWARGS(request, filter_fields))
@@ -128,17 +126,17 @@ def getproducts_auth(request):
         {'name': 'name', 'convert': None, 'replace':'name__icontains'},
         {'name': 'weight', 'convert': None, 'replace':'weight'},
         {'name': 'quntity', 'convert': None, 'replace':'quntity'},
-        # {'name': 'costprice', 'convert': None, 'replace':'costprice'},
-        # {'name': 'mrpprice', 'convert': None, 'replace':'mrpprice'}
+        {'name': 'type', 'convert': None, 'replace':'type__icontains'},
     ]
 
     products = MODELS_PROD.Product.objects.filter(**ghelp().KWARGS(request, filter_fields))
 
     #One sheach feild at a time 1 atribute but options will many
     #the filter will look for the search_term in the name, contact_no, or email fields.
-    # search_term = request.GET.get('search_term')
-    # if search_term != None:
-    #     products = products.filter(Q(name__icontains=search_term) | Q(costprice__icontains=search_term) | Q(mrpprice__icontains=search_term))
+    search_term = request.GET.get('search_term')
+    if search_term != None:
+        products = products.filter(Q(name__icontains=search_term) | Q(costprice__icontains=search_term) | Q(mrpprice__icontains=search_term))
+
 
     products, total_count, page, page_size = ghelp().getPaginatedData(request, products)
 

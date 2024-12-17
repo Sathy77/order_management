@@ -247,10 +247,7 @@ class Microhelps(Nanohelps):
                     else: response['message'].append('order should be list type!')
                 else: response['message'].append('order is required!')
             else: response['message'].append('details should be dict type!')
-        return response
-        
-
-
+        return response 
     
     def validateprofilepic(self, image):
       response = {'flag': False, 'message': []}

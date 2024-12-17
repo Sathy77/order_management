@@ -1,6 +1,6 @@
 from django.db import models
 from helps.abstract.abstractclass import Basic
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 from helps.common.generic import Generichelps as ghelp
 from helps.choice import common as CHOICE
 from user import models as MODELS_USER
