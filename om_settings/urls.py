@@ -4,6 +4,7 @@ from om_settings import views
 urlpatterns = [
     path('get-setting/', views.getsettings, name='get-setting'),
     path('update-setting/<int:settingid>', views.updatesetting, name='update-setting'),
+    path('get-public-information/', views.getpublicinformations, name='get-public-information'),
     # path('delete-zone/<int:zoneid>', views.deletezone, name='delete-zone'),
     
 ]

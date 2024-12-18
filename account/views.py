@@ -205,13 +205,13 @@ def gettransections(request):
     order = request.GET.get('order')
     
     if search_term == 'expense':
-        transections = MODELS_ACCO.Transection.objects.filter(income__isnull=True)
+        transections = transections.filter(income__isnull=True)
     
     elif search_term == 'income':
-        transections = MODELS_ACCO.Transection.objects.filter(expense__isnull=True)
+        transections = transections.filter(expense__isnull=True)
 
     if order == 'all':
-        transections = MODELS_ACCO.Transection.objects.filter(ordersummary__isnull=False)
+        transections = transections.filter(ordersummary__isnull=False)
 
     if heads:
         transections = transections.filter(Q(income__title__icontains=heads) | Q(expense__title__icontains=heads))
@@ -327,10 +327,11 @@ def updatetransection(request, transectionid=None):
     if new_expense: requestdata.update({'income': None})
     
     new_amount = requestdata.get('amount')
+    if not new_amount: new_amount = 0
 
-    transection = MODELS_ACCO.Transection.objects.filter(id=transectionid)
-    previous_amount = transection.first().amount
+    transection = MODELS_ACCO.Transection.objects.filter(id=transectionid) 
     if transection.exists():
+        previous_amount = transection.first().amount
         previous_incomeid = transection.first().income.id if transection.first() and transection.first().income else None
         previous_expenseid = transection.first().expense.id if transection.first() and transection.first().expense else None
         if previous_incomeid:
@@ -348,6 +349,7 @@ def updatetransection(request, transectionid=None):
                 )
             else: 
                 amount = requestdata.get('amount')
+                if not amount: amount = 0
                 income = MODELS_ACCO.Income.objects.filter(id=previous_incomeid) 
                 balance = income.first().balance
                 balance = balance - amount

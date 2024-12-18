@@ -981,8 +981,8 @@ def updateorderstatus(request, ordersummaryid=None):
 
 
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_order'])
+@permission_classes([IsAuthenticated])
+@deco.get_permission(['create_order'])
 def addorder_auth(request):
     response_data = {}
     response_message = []

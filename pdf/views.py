@@ -189,14 +189,14 @@ def get_transections_pdf(request):
     expense_total_amount = 0
     income_total_amount = 0
     if search_term == 'expense':
-        transections = MODELS_ACCO.Transection.objects.filter(income__isnull=True)
+        transections = transections.filter(income__isnull=True)
         if not heads:
             for transection in transections:
                 amount = transection.amount
                 expense_total_amount += amount
     
     elif search_term == 'income':
-        transections = MODELS_ACCO.Transection.objects.filter(expense__isnull=True)
+        transections = transections.filter(expense__isnull=True)
         if not heads:
             for transection in transections:
                 amount = transection.amount
@@ -215,11 +215,11 @@ def get_transections_pdf(request):
 
     if not search_term :
         if not heads:
-            expense_transections = MODELS_ACCO.Transection.objects.filter(income__isnull=True)
+            expense_transections = transections.filter(income__isnull=True)
             for expense_transection in expense_transections:
                 amount = expense_transection.amount
                 expense_total_amount += amount
-            income_transections = MODELS_ACCO.Transection.objects.filter(expense__isnull=True)
+            income_transections = transections.filter(expense__isnull=True)
             for income_transection in income_transections:
                 amount = income_transection.amount
                 income_total_amount += amount

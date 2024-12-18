@@ -4,6 +4,7 @@ from helps.decorators.decorator import CommonDecorator as deco
 from om_settings import models as MODELS_OMSE
 from om_settings.serializer.POST import serializers as POST_SRLZER_OMSE
 from om_settings.serializer.GET import serializers as GET_SRLZER_OMSE
+from om_settings.serializer.CUSTOM import serializers as CUST_SRLZER_OMSE
 from helps.common.generic import Generichelps as ghelp
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -65,7 +66,40 @@ def getsettings(request):
         'results': settingserializers.data
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# @deco.get_permission(['view_setting'])
+def getpublicinformations(request):
+    filter_fields = [
+        {'name': 'id', 'convert': None, 'replace':'id'},
+        {'name': 'company_name', 'convert': None, 'replace':'company_name__icontains'},
+        {'name': 'address', 'convert': None, 'replace':'address__icontains'},
+        {'name': 'phone_number', 'convert': None, 'replace':'phone_number__icontains'},
+        {'name': 'email', 'convert': None, 'replace':'email'},
 
+        # {'name': 'vat_no', 'convert': None, 'replace':'vat_no__icontains'},
+        # {'name': 'business_identification_number', 'convert': None, 'replace':'business_identification_number__icontains'},
+        # {'name': 'bsti_registration_number', 'convert': None, 'replace':'bsti_registration_number__icontains'},
+        # {'name': 'iso_certification_number', 'convert': None, 'replace':'iso_certification_number__icontains'},
+
+        {'name': 'website_url', 'convert': None, 'replace':'website_url__icontains'},
+        {'name': 'facebook_url', 'convert': None, 'replace':'facebook_url__icontains'},
+        {'name': 'instagram_url', 'convert': None, 'replace':'instagram_url__icontains'},
+        {'name': 'whatsapp_url', 'convert': None, 'replace':'whatsapp_url__icontains'},
+        {'name': 'tiktok_url', 'convert': None, 'replace':'tiktok_url__icontains'},
+        {'name': 'x_url', 'convert': None, 'replace':'x_url__icontains'},
+        {'name': 'youtube_url', 'convert': None, 'replace':'youtube_url__icontains'},
+    ]
+
+    settings = MODELS_OMSE.Settings.objects.filter(**ghelp().KWARGS(request, filter_fields))
+    settings, total_count, page, page_size = ghelp().getPaginatedData(request, settings)
+    settingserializers = CUST_SRLZER_OMSE.Settingserializer(settings, many=True)
+    return Response({'data': {
+        'count': total_count,
+        'page': page,
+        'page_size': page_size,
+        'results': settingserializers.data
+    }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 # @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
 # # @deco.get_permission(['get company info', 'all'])
