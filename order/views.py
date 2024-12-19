@@ -1419,7 +1419,7 @@ def updateorder_auth(request, ordersummaryid=None):
                             'combo_quantity': given_combo_quantity if given_combo_quantity else 0,
                             'order_note': order_note if order_note else ""
                     }
-                        allowed_fields=['user', 'deliveryzone', 'product_cost', 'delivery_cost', 'free_delivery', 'grand_total', 'total_profit', 'discount', 'payment_mode', 'coupon']
+                        allowed_fields=['user', 'deliveryzone', 'product_cost', 'delivery_cost', 'free_delivery', 'grand_total', 'total_profit', 'discount', 'payment_mode', 'coupon','is_combo', 'combo_quantity', 'order_note']
                         response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
                             classOBJ=MODELS_ORDE.Ordersummary, 
                             Serializer=POST_SRLZER_ORDE.Ordersummaryserializer, 

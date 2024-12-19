@@ -67,8 +67,6 @@ def getsettings(request):
     }, 'message': [], 'status': 'success'}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_setting'])
 def getpublicinformations(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},

@@ -10,7 +10,7 @@ ORDER_STATUS = (
     ('Hand over to courier', 'Hand over to courier'),
     ('Delivered', 'Delivered'), 
     ('Cancelled', 'Cancelled'), 
-    ('Returned', 'Returned'), 
+    ('Returned', 'Returned'),
 )
 PAYMENT_STATUS = (
     ('Pending','Pending'),

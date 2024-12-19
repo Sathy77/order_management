@@ -17,7 +17,7 @@ from django.db.models import Q
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_permission'])
+@deco.get_permission(['view_permission'])
 def getpermissioncategory(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -38,7 +38,7 @@ def getpermissioncategory(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_permission'])
+@deco.get_permission(['view_permission'])
 def getpermissions(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -58,7 +58,7 @@ def getpermissions(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_permission'])
+@deco.get_permission(['create_permission'])
 def addpermission(request):
     requestdata = request.data.copy()
     # userid = request.user.id
@@ -77,7 +77,7 @@ def addpermission(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_permission'])
+@deco.get_permission(['edit_permission'])
 def updatepermission(request, permissionid=None):
     # userid = request.user.id
     # extra_fields = {}
@@ -94,7 +94,7 @@ def updatepermission(request, permissionid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['delete_permission'])
+@deco.get_permission(['delete_permission'])
 def deletepermission(request, permissionid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_USER.Permission,
@@ -104,7 +104,7 @@ def deletepermission(request, permissionid=None):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['view_role'])
+@deco.get_permission(['view_role'])
 def getroles(request):
     filter_fields = [
         {'name': 'id', 'convert': None, 'replace':'id'},
@@ -125,7 +125,7 @@ def getroles(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['create_role'])
+@deco.get_permission(['create_role'])
 def addrole(request):
     requestdata = request.data.copy()
     # userid = request.user.id
@@ -144,7 +144,7 @@ def addrole(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['edit_role'])
+@deco.get_permission(['edit_role'])
 def updaterole(request, roleid=None):
     response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
         classOBJ=MODELS_USER.Role, 
@@ -157,7 +157,7 @@ def updaterole(request, roleid=None):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @deco.get_permission(['delete_role'])
+@deco.get_permission(['delete_role'])
 def deleterole(request, roleid=None):
     response_data, response_message, response_successflag, response_status = ghelp().deleterecord(
         classOBJ=MODELS_USER.Role,
@@ -176,7 +176,8 @@ def getusers(request):
         {'name': 'name', 'convert': None, 'replace':'name__icontains'},
         {'name': 'address', 'convert': None, 'replace':'address__icontains'},
         {'name': 'contact_no', 'convert': None, 'replace':'acontact_no'},
-        {'name': 'email', 'convert': None, 'replace':'email__icontains'}
+        {'name': 'email', 'convert': None, 'replace':'email__icontains'},
+        {'name': 'role', 'convert': None, 'replace':'role__icontains'}
     ]
     KWARGS = ghelp().KWARGS(request, filter_fields)
     KWARGS.update({'user_type': 'Admin'})

@@ -2,8 +2,10 @@ from rest_framework import serializers
 from user import models
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
+from user.serializer.GET import serializers as GET_SRLZER_USER
 
 class Userserializer(serializers.ModelSerializer):
+    role = GET_SRLZER_USER.Roleserializer(many=True)
     class Meta:
         model = models.User
         fields = '__all__'
