@@ -152,7 +152,8 @@ def updaterole(request, roleid=None):
         id=roleid,
         data=request.data,
     )
-    response_data = response_data.data if response_successflag == 'success' else {}
+    
+    response_data = CUSTOM_SRLZER_USER.Roleserializer(response_data.instance, many=False).data if response_successflag == 'success' else {}
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 @api_view(['DELETE'])
@@ -253,7 +254,7 @@ def updateuser(request, uuserid=None):
         # freez_update=freez_update,
         extra_fields=extra_fields
     )
-    response_data = response_data.data if response_successflag == 'success' else {}
+    response_data =  GET_SRLZER_USER.Userserializer(response_data.instance, many=False).data if response_successflag == 'success' else {}
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
 
 @api_view(['DELETE'])

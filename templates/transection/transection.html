@@ -95,7 +95,7 @@
             </div>
         </div>
         <div class="titleBox">
-            <div class="title">All Orders</div>
+            <div class="title">All Transections</div>
             <p class="date">Generated on: {{ time_now|date:"M-d-Y, H:i A" }}</p>
         </div>
         <table>
@@ -129,10 +129,18 @@
                         {% endif %}
                     </td>
                     {% if income_total_amount > 0 %}
-                    <td>{{ transection.amount }}</td>
+                        {% if transection.income %}
+                            <td>{{ transection.amount }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
                     {% endif %}
                     {% if expense_total_amount > 0 %}
-                    <td>{{ transection.amount }}</td>
+                        {% if transection.expense %}
+                            <td>{{ transection.amount }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
                     {% endif %}
                     
                 </tr>

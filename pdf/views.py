@@ -193,36 +193,43 @@ def get_transections_pdf(request):
         if not heads:
             for transection in transections:
                 amount = transection.amount
-                expense_total_amount += amount
+                if amount != None:
+                    expense_total_amount += amount
     
     elif search_term == 'income':
         transections = transections.filter(expense__isnull=True)
         if not heads:
             for transection in transections:
                 amount = transection.amount
-                income_total_amount += amount
+                if amount != None:
+                    income_total_amount += amount
 
     if heads:
         transections = transections.filter(Q(income__title__icontains=heads) | Q(expense__title__icontains=heads))  
         if search_term == 'expense':
             for transection in transections:
                 amount = transection.amount
-                expense_total_amount += amount
+                if amount != None:
+                    expense_total_amount += amount
         elif search_term == 'income':
             for transection in transections:
                 amount = transection.amount
-                income_total_amount += amount
+                if amount != None:
+                    income_total_amount += amount
 
+                    
     if not search_term :
         if not heads:
             expense_transections = transections.filter(income__isnull=True)
             for expense_transection in expense_transections:
                 amount = expense_transection.amount
-                expense_total_amount += amount
+                if amount != None:
+                    expense_total_amount += amount
             income_transections = transections.filter(expense__isnull=True)
             for income_transection in income_transections:
                 amount = income_transection.amount
-                income_total_amount += amount
+                if amount != None:
+                    income_total_amount += amount
 
     time_now = timezone.now()
     settings = MODELS_SETT.Settings.objects.first()
@@ -245,6 +252,7 @@ def get_transections_pdf(request):
         'income_total_amount': income_total_amount,
         'expense_total_amount': expense_total_amount,
     }
+
 
     # Render HTML template with context
     template = get_template('transection/transection.html')
