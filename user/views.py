@@ -368,7 +368,7 @@ def updatecustomer(request, customerid=None):
     if contact_no:
         contact_no = '8801' + contact_no[-9:]
         requestdata.update({'contact_no': contact_no})
-    extra_fields = {}
+    extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1]}
     if userid: extra_fields.update({'updated_by': userid})
     allowed_fields=['name', 'address', 'contact_no', 'email']
     # freez_update = [{'user_type': 'Admin'}]  //user type admin paile purai r update korte dibe na

@@ -50,7 +50,7 @@ def addproduct(request):
     if types:
         if types == CHOICE.TYPE[2][1]:
             requestdata['mrpprice'] = '0'
-        elif types == CHOICE.TYPE[0][1]:
+        elif types in (CHOICE.TYPE[0][1], CHOICE.TYPE[3][1], CHOICE.TYPE[4][1]):
             requestdata['capacity'] = '0'
     requestdata = dict(requestdata)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
@@ -82,7 +82,7 @@ def updateproduct(request, productid=None):
     if types:
         if types == CHOICE.TYPE[2][1]:
             requestdata['mrpprice'] = '0'
-        elif types == CHOICE.TYPE[0][1]:
+        elif types in (CHOICE.TYPE[0][1], CHOICE.TYPE[3][1], CHOICE.TYPE[4][1]):
             requestdata['capacity'] = '0'
     requestdata = dict(requestdata)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})

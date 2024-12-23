@@ -208,6 +208,7 @@ def addorder_noauth(request):
     response_successflag = 'error'
     response_status = status.HTTP_400_BAD_REQUEST
     requestdata = request.data.copy()
+
     userid = request.user.id
 
     response = {}
@@ -222,6 +223,7 @@ def addorder_noauth(request):
 
     contact_no = request.data.get('contact_no')
     contact_no = '8801' + contact_no[-9:]
+    request.data['contact_no'] = contact_no
     otp = request.data.get('otp')
     if contact_no and otp:
         requestdata.update({'contact_no': contact_no})
@@ -264,7 +266,8 @@ def addorder_noauth(request):
                             user = MODELS_USER.User.objects.filter(contact_no__icontains=contact_no)
                             if not user.exists():
                                 allowed_fields = ['name', 'address', 'contact_no', 'email']
-                                extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1], 'created_by': userid, 'updated_by': userid}
+                                extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1]}
+                                if userid: extra_fields.update({'created_by': userid, 'updated_by': userid})
                                 required_fields = ['name', 'address', 'contact_no']
                                 fields_regex = [{'field': 'contact_no', 'type': 'phonenumber'}]
                                 unique_fields=['contact_no']
@@ -282,10 +285,10 @@ def addorder_noauth(request):
                                 elif responsesuccessflag == 'error': response_message.extend(responsemessage)
                             elif user.exists(): 
                                 user = user.first()
-                                request.data['contact_no'] = contact_no
-                                extra_fields = {}
+                                extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1]}
                                 if userid: extra_fields.update({'updated_by': userid})
                                 allowed_fields=['name', 'address', 'contact_no', 'email']
+                                fields_regex = [{'field': 'contact_no', 'type': 'phonenumber'}]
                                 # freez_update = [{'user_type': 'Admin'}]  //user type admin paile purai r update korte dibe na
                                 responsedata, responsemessage, responsesuccessflag, responsestatus = ghelp().updaterecord(
                                     classOBJ=MODELS_USER.User, 
@@ -295,7 +298,8 @@ def addorder_noauth(request):
                                     allowed_fields = allowed_fields,
                                     unique_fields=['contact_no'],
                                     # freez_update=freez_update,
-                                    extra_fields=extra_fields
+                                    extra_fields=extra_fields,
+                                    fields_regex=fields_regex
                                 )
                                 if responsesuccessflag == 'success': user = responsedata.instance
                                 elif responsesuccessflag == 'error': response_message.extend(responsemessage)
