@@ -6,6 +6,7 @@ from otp import models as MODELS_OTP
 from otp import sendotp 
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Q
 
 
 
@@ -18,13 +19,18 @@ def generate_otp(request):
     otp = random.randint(1000, 9999)
     # otp = f'OTP- {random.randint(1000, 9999)}'
     phone = [contact_no]
+
+    cutoff_time = timezone.now() - timedelta(minutes=10)
+    old_otps = MODELS_OTP.Otp.objects.filter(
+        Q(created_at__lt=cutoff_time) | Q(phone=contact_no)
+    )
+    old_otps.delete()
+
     # Create and save a new OTP
     otpintance = MODELS_OTP.Otp(phone=contact_no, otp_code=otp)
     otpintance.save()
 
-    cutoff_time = timezone.now() - timedelta(minutes=10)
-    old_otps = MODELS_OTP.Otp.objects.filter(created_at__lt=cutoff_time)
-    old_otps.delete()
+    
 
     status_code = sendotp.send_otp(otp, phone)
 
