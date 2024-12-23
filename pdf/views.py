@@ -15,7 +15,7 @@ from playwright.sync_api import sync_playwright
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@deco.get_permission(['order_report_view'])
+@deco.get_permission(['view_order'])
 def get_orders_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
@@ -94,7 +94,7 @@ def get_orders_pdf(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@deco.get_permission(['customer_report_view'])
+@deco.get_permission(['view_customer'])
 def get_customers_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
@@ -166,7 +166,7 @@ def get_customers_pdf(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@deco.get_permission(['transection_report_view'])
+@deco.get_permission(['view_transection'])
 def get_transections_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
@@ -287,7 +287,7 @@ def get_transections_pdf(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@deco.get_permission(['product_report_view'])
+@deco.get_permission(['view_product'])
 def get_products_pdf(request):
     # Filter fields for the order queryset
     filter_fields = [
