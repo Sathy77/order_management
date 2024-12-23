@@ -88,12 +88,13 @@ def updateproduct(request, productid=None):
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
     options = {'allow_blank': True, 'allow_empty': False}
     form = NestedForm(requestdata, **options)
+    
     form.is_nested(raise_exception=True)
     requestdata = ghelp().prepareData(form.data, 'product')
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'updated_by': userid})
-    allowed_fields=['name', 'photo', 'weight', 'quntity', 'costprice', 'mrpprice']
+    allowed_fields=['name', 'photo', 'weight', 'quntity', 'costprice', 'mrpprice','capacity', 'type']
     static_fields = ['photo']
     response_data, response_message, response_successflag, response_status = ghelp().updaterecord(
         classOBJ=MODELS_PROD.Product, 
