@@ -208,7 +208,8 @@ def adduser(request):
     email = requestdata.get('email')
     contact_no = requestdata.get('contact_no')
     if contact_no:
-        contact_no = '8801' + contact_no[-9:]
+        contact_no = '8801' + contact_no[-9:]  
+        
     prepare_data={
         'name': requestdata.get('name'),
         'contact_no': contact_no,
@@ -238,6 +239,7 @@ def updateuser(request, uuserid=None):
     contact_no = requestdata.get('contact_no')
     if contact_no: 
         contact_no = '8801' + contact_no[-9:]
+        requestdata['contact_no'] = contact_no
     extra_fields = {}
     if userid: extra_fields.update({'updated_by': userid})
     if 'username' in requestdata: requestdata['username'] = requestdata['username'].lower()
