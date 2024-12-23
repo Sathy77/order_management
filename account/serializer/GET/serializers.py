@@ -5,12 +5,12 @@ from order.serializer.GET import serializers as GET_SRLZER_ORDE
 class Incomeserializer(serializers.ModelSerializer):
     class Meta:
         model = models.Income
-        fields = ['id', 'title', 'balance']
+        fields = ['id', 'title']
 
 class Expenseserializer(serializers.ModelSerializer):
     class Meta:
         model = models.Expense
-        fields = ['id', 'title', 'balance']
+        fields = ['id', 'title']
 
 class Transectionserializer(serializers.ModelSerializer):
     income = Incomeserializer()

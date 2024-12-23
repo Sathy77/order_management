@@ -57,7 +57,7 @@ def addincome(request):
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
-    required_fields = ['title', 'balance']
+    required_fields = ['title']
     response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
         classOBJ=MODELS_ACCO.Income, 
         Serializer=POST_SRLZER_ACCO.Incomeserializer, 
@@ -140,7 +140,7 @@ def addexpense(request):
     userid = request.user.id
     extra_fields = {}
     if userid: extra_fields.update({'created_by': request.user.id, 'updated_by': request.user.id})
-    required_fields = ['title', 'balance']
+    required_fields = ['title']
     # fields_regex = [{'field': 'date', 'type': 'date'}, {'field': 'in_time', 'type': 'time'}, {'field': 'out_time', 'type': 'time'}]
     response_data, response_message, response_successflag, response_status = ghelp().addtocolass(
         classOBJ=MODELS_ACCO.Expense, 
