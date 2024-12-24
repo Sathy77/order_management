@@ -24,6 +24,7 @@ TYPE = (
     ('general-box', 'general-box'),
     ('combo', 'combo'),
     ('external', 'external'),
+    ('internal', 'internal'),
 )
 BLOOD_GROUP = (
     ('A+', 'A+'),

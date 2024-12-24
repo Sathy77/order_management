@@ -50,7 +50,7 @@ def addproduct(request):
     if types:
         if types == CHOICE.TYPE[2][1]:
             requestdata['mrpprice'] = '0'
-        elif types in (CHOICE.TYPE[0][1], CHOICE.TYPE[3][1], CHOICE.TYPE[4][1]):
+        elif types in (CHOICE.TYPE[0][1], CHOICE.TYPE[3][1], CHOICE.TYPE[4][1], CHOICE.TYPE[5][1]):
             requestdata['capacity'] = '0'
     requestdata = dict(requestdata)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
@@ -82,7 +82,7 @@ def updateproduct(request, productid=None):
     if types:
         if types == CHOICE.TYPE[2][1]:
             requestdata['mrpprice'] = '0'
-        elif types in (CHOICE.TYPE[0][1], CHOICE.TYPE[3][1], CHOICE.TYPE[4][1]):
+        elif types in (CHOICE.TYPE[0][1], CHOICE.TYPE[3][1], CHOICE.TYPE[4][1], CHOICE.TYPE[5][1]):
             requestdata['capacity'] = '0'
     requestdata = dict(requestdata)
     requestdata.update({'abcdef[abcdef]': ['abcdef']})
@@ -137,7 +137,6 @@ def getproducts_auth(request):
     search_term = request.GET.get('search_term')
     if search_term != None:
         products = products.filter(Q(name__icontains=search_term) | Q(costprice__icontains=search_term) | Q(mrpprice__icontains=search_term) | Q(type__icontains=search_term))
-
 
     products, total_count, page, page_size = ghelp().getPaginatedData(request, products)
 
