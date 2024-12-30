@@ -94,8 +94,15 @@
     <div class="container">
         <div class="header">
             <div class="clogo">
-                <img src="{{ logo }}" alt="Company Logo" class="logo" />
-                <div class="company-name">{{ company_name }}</div>
+                <div style="display: flex; flex-direction: column; width: 180px;">
+
+                     <div style="display: flex; justify-content: center;">
+                        <img src="{{ logo }}" alt="Company Logo" class="logo" />
+                     </div>
+                     <div style="display: flex; justify-content: center;">
+                        <span style="text-align: center;">{{company_name}}</span>
+                     </div>
+                </div>
             </div>
             <div class="address">
                 <p><b>Address: </b> {{ address }}</p>
@@ -105,18 +112,18 @@
         </div>
         <div class="titleBox">
             <div class="title">All Orders</div>
-            <p class="date">Generated on: {{ time_now|date:"M-d-Y, H:i A" }}</p>
+            <p class="date">Generated on: {{current_date}}</p>
         </div>
         <table>
             <thead>
                 <tr>
                     <th>Sl.</th>
+                    <th>Date</th>
                     <th>Invoice No</th>
                     <th>Customer</th>
-                    <th>Date</th>
                     <th>Delivery Zone</th>
                     <th>Payment Mode</th>
-                    <th>Total</th>
+                    <th>Total Amount</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -124,9 +131,9 @@
                 {% for order in orders %}
                 <tr class="tblrow">
                     <td>{{ forloop.counter }}</td>
+                    <td>{{ order.date }}</td>
                     <td>{{ order.invoice_no }}</td>
                     <td>{{ order.user.name }}</td>
-                    <td>{{ order.date }}</td>
                     <td>{{ order.deliveryzone.name }}</td>
                     <td>{{ order.get_payment_mode_display }}</td>
                     <td>{{ order.grand_total }} TK</td>

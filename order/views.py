@@ -6,7 +6,6 @@ from order import models as MODELS_ORDE
 from order import models as MODELS_ORDE
 from user import models as MODELS_USER
 from product import models as MODELS_PROD
-from account import models as MODELS_ACCO
 from otp import sendotp 
 from account.serializer.GET import serializers as GET_SRLZER_ACCO
 from account.serializer.POST import serializers as POST_SRLZER_ACCO
@@ -264,6 +263,7 @@ def addorder_noauth(request):
                         response = ghelp().purifyProducts(MODELS_PROD.Product, requestdata)
                         if not response['message']:
                             user = MODELS_USER.User.objects.filter(contact_no__icontains=contact_no)
+                            user = user.filter(user_type='Customer')
                             if not user.exists():
                                 allowed_fields = ['name', 'address', 'contact_no', 'email']
                                 extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1]}

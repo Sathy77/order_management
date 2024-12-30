@@ -26,7 +26,13 @@
             padding: 10px 20px;
             z-index: 1000;
         }
-        .clogo, .address {
+        /* .clogo, .address {
+            width:49%;
+        } */
+        .clogo {
+            width:49%;
+        }
+        .address {
             width:49%;
         }
         .titleBox {
@@ -93,8 +99,15 @@
     <div class="container">
         <div class="header">
             <div class="clogo">
-                <img src="{{ logo }}" alt="Company Logo" class="logo" />
-                <div class="company-name">{{ company_name }}</div>
+                <div style="display: flex; flex-direction: column; width: 180px;">
+
+                     <div style="display: flex; justify-content: center;">
+                        <img src="{{ logo }}" alt="Company Logo" class="logo" />
+                     </div>
+                     <div style="display: flex; justify-content: center;">
+                        <span style="text-align: center;">{{company_name}}</span>
+                     </div>
+                </div>
             </div>
             <div class="address">
                 <p><b>Address: </b> {{ address }}</p>
@@ -104,7 +117,7 @@
         </div>
         <div class="titleBox">
             <div class="title">All Customers</div>
-            <p class="date">Generated on: {{ time_now|date:"M-d-Y, H:i A" }}</p>
+            <p class="date">Generated on: {{current_date}}</p>
         </div>
         <table>
             <thead>

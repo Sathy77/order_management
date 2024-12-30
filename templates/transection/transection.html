@@ -85,8 +85,15 @@
     <div class="container">
         <div class="header">
             <div class="clogo">
-                <img src="{{ logo }}" alt="Company Logo" class="logo" />
-                <div class="company-name">{{ company_name }}</div>
+                <div style="display: flex; flex-direction: column; width: 180px;">
+
+                     <div style="display: flex; justify-content: center;">
+                        <img src="{{ logo }}" alt="Company Logo" class="logo" />
+                     </div>
+                     <div style="display: flex; justify-content: center;">
+                        <span style="text-align: center;">{{company_name}}</span>
+                     </div>
+                </div>
             </div>
             <div class="address">
                 <p><b>Address: </b> {{ address }}</p>
@@ -96,7 +103,7 @@
         </div>
         <div class="titleBox">
             <div class="title">All Transections</div>
-            <p class="date">Generated on: {{ time_now|date:"M-d-Y, H:i A" }}</p>
+            <p class="date">Generated on: {{current_date}}</p>
         </div>
         <table>
             <thead>
@@ -104,6 +111,7 @@
                     <th>Sl.</th>
                     <th>Date</th>
                     <th>Description</th>
+                    <th>Head</th>
                     {% if income_total_amount > 0 %}
                     <th>Income</th>
                     {% endif %}
@@ -128,6 +136,12 @@
                             <b>Customer Name: </b> {{ transection.ordersummary.user.name }}
                         {% endif %}
                     </td>
+                    {% if transection.income %}
+                        <td>{{ transection.income.title }}</td>
+                    {% else %}
+                        <td>{{ transection.expense.title }}</td>
+                    {% endif %}
+
                     {% if income_total_amount > 0 %}
                         {% if transection.income %}
                             <td>{{ transection.amount }}</td>
@@ -150,6 +164,7 @@
                     <td><b>Total</b></td>
                     <td></td>
                     {% if income_total_amount > 0 %}
+                    <td> </td>
                     <td>{{ income_total_amount }}</td>
                     {% endif %}
                     {% if expense_total_amount > 0 %}

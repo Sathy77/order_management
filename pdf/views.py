@@ -43,6 +43,7 @@ def get_orders_pdf(request):
     # Fetch orders with the applied filters
     orders = MODELS_ORDE.Ordersummary.objects.filter(**ghelp().KWARGS(request, filter_fields))
     time_now = timezone.now()
+    current_date = time_now.date()
     settings = MODELS_SETT.Settings.objects.first()
     if settings and settings.logo:
     # Convert the logo path to a full URL
@@ -52,7 +53,7 @@ def get_orders_pdf(request):
 
     context = {
         'orders': orders,
-        'time_now': time_now,
+        'current_date': current_date,
         'site_name': settings.company_name if settings else '',
         'company_name': settings.company_name if settings else '',
         'logo': logo_url,
@@ -116,6 +117,7 @@ def get_customers_pdf(request):
         customers = customers.filter(Q(name__icontains=search_term) | Q(email__icontains=search_term) | Q(contact_no__icontains=search_term))
     
     time_now = timezone.now()
+    current_date = time_now.date()
     settings = MODELS_SETT.Settings.objects.first()
     if settings and settings.logo:
     # Convert the logo path to a full URL
@@ -124,7 +126,7 @@ def get_customers_pdf(request):
         logo_url = ''
     context = {
         'customers': customers,
-        'time_now': time_now,
+        'current_date': current_date,
         'site_name': settings.company_name if settings else '',
         'company_name': settings.company_name if settings else '',
         'logo': logo_url,
@@ -232,6 +234,7 @@ def get_transections_pdf(request):
                     income_total_amount += amount
 
     time_now = timezone.now()
+    current_date = time_now.date()
     settings = MODELS_SETT.Settings.objects.first()
     if settings and settings.logo:
     # Convert the logo path to a full URL
@@ -242,7 +245,7 @@ def get_transections_pdf(request):
 
     context = {
         'transections': transections,
-        'time_now': time_now,
+        'current_date': current_date,
         'site_name': settings.company_name if settings else '',
         'company_name': settings.company_name if settings else '',
         'logo': logo_url,
@@ -306,6 +309,7 @@ def get_products_pdf(request):
   
 
     time_now = timezone.now()
+    current_date = time_now.date()
     settings = MODELS_SETT.Settings.objects.first()
     if settings and settings.logo:
     # Convert the logo path to a full URL
@@ -316,7 +320,7 @@ def get_products_pdf(request):
 
     context = {
         'products': products,
-        'time_now': time_now,
+        'current_date': current_date,
         'site_name': settings.company_name if settings else '',
         'company_name': settings.company_name if settings else '',
         'logo': logo_url,

@@ -7,7 +7,7 @@ PAYMENT_MODE = (
 ORDER_STATUS = (
     ('Pending','Pending'),
     ('On Process', 'On Process'), 
-    ('Hand over to courier', 'Hand over to courier'),
+    ('Hand Over to Courier', 'Hand Over to Courier'),
     ('Delivered', 'Delivered'), 
     ('Cancelled', 'Cancelled'), 
     ('Returned', 'Returned'),
