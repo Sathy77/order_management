@@ -6,6 +6,7 @@ from order import models as MODELS_ORDE
 from order import models as MODELS_ORDE
 from user import models as MODELS_USER
 from product import models as MODELS_PROD
+from account import models as MODELS_ACCO
 from otp import sendotp 
 from account.serializer.GET import serializers as GET_SRLZER_ACCO
 from account.serializer.POST import serializers as POST_SRLZER_ACCO

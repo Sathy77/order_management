@@ -11,6 +11,7 @@ def generate_unique_code():
 
 class Permissioncategory(Basic):
     name = models.CharField(max_length=50, unique=True)
+    serial = models.IntegerField(blank=True, null=True)
     def __str__(self):
         return f'{self.id} - {self.name}'
 
@@ -18,6 +19,7 @@ class Permissioncategory(Basic):
 class Permission(Basic):
     name = models.CharField(max_length=50, unique=True)
     category = models.ForeignKey(Permissioncategory, on_delete=models.CASCADE, related_name='permissions')
+    serial = models.IntegerField(blank=True, null=True)
     # code  = models.CharField(max_length=15, default=generate_code, unique=True, editable=False)
     # active = models.BooleanField(default=True)
     # created_at = models.DateTimeField(auto_now_add=True)

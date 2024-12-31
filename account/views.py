@@ -13,8 +13,6 @@ from django.db.models import Q
 
 
 
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @deco.get_permission(['view_income'])
