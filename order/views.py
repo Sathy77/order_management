@@ -46,7 +46,7 @@ def getordersummary(request):
         # {'name': 'deliveryzone', 'convert': None, 'replace':'deliveryzone__name__icontains'},
 
         {'name': 'invoice_no', 'convert': None, 'replace':'invoice_no__icontains'},
-        {'name': 'deliveryzone', 'convert': None, 'replace':'deliveryzone'},
+        {'name': 'delivery_zone', 'convert': None, 'replace':'deliveryzone'},
         {'name': 'payment_mode', 'convert': None, 'replace':'payment_mode'},
         {'name': 'product_cost', 'convert': None, 'replace':'product_cost'},
         {'name': 'delivery_cost', 'convert': None, 'replace':'delivery_cost'},
