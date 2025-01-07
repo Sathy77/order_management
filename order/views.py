@@ -413,7 +413,7 @@ def updateorderstatus(request, ordersummaryid=None):
                     else: response_message.append(f"{previous_order_status} product can/'t updated to {new_order_status}")
                 elif previous_order_status in [CHOICE.ORDER_STATUS[4][1], CHOICE.ORDER_STATUS[5][1]]: response_message.append(f"Status is already {new_order_status}")
             
-#### payment_status
+            #### payment_status
         
             if new_payment_status:
                 income = MODELS_ACCO.Income.objects.filter(title='Sales')
@@ -657,9 +657,6 @@ def updateorderstatus(request, ordersummaryid=None):
     if response_message:
         response_successflag = 'error'
     return Response({'data': response_data, 'message': response_message, 'status': response_successflag}, status=response_status)
-
-
-
 
 
 @api_view(['POST'])
