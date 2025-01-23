@@ -1,4 +1,3 @@
-from user import models as MODEL_USER
 from rest_framework.response import Response
 from helps.common.generic import Generichelps as ghelp
 from rest_framework import status
@@ -11,10 +10,11 @@ class CommonDecorator:
 
     def get_permission(users=[], message='Permission Denied!'):
         lower_case_users = [user.lower() for user in users]
-        permissions = []
+        # permissions = []
         def decorator(func):
             def wrapper_func(request, *args, **kwargs):
-                ghelp().getPermissionsList(User=MODEL_USER.User, username=request.user.username, permissions=permissions, active=True)
+                # ghelp().getPermissionsList(User=MODEL_USER.User, username=request.user.username, permissions=permissions, active=True)
+                permissions = ghelp().getPermissionsList(user=request.user, active=True)
                 if permissions:
                     if any(permission in lower_case_users for permission in permissions):
                         return func(request, *args, **kwargs)

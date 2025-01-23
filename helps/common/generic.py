@@ -212,15 +212,24 @@ class Generichelps(Minihelps):
         total_profit = (product_cost -discount_total) - trade_cost
         return product_cost, grand_total, total_profit, discount_total
 
-    def getPermissionsList(self, User, username, permissions, all=False, active=False, inactive=False):
+    # def getPermissionsList(self, User, username, permissions, all=False, active=False, inactive=False):
+    #     if all + active + inactive == 1:
+    #         user = User.objects.filter(username=username)
+    #         if user.exists():
+    #             user = user.first()
+    #             if user.is_active:
+    #                 if all: self.getPermissionsListIfAll(permissions, user)
+    #                 elif active: self.getPermissionsListIfActiveOrInactive(permissions, user, True)
+    #                 else: self.getPermissionsListIfActiveOrInactive(permissions, user, False)
+
+    def getPermissionsList(self, user=None, all=False, active=False, inactive=False):
+        permissions = []
         if all + active + inactive == 1:
-            user = User.objects.filter(username=username)
-            if user.exists():
-                user = user.first()
-                if user.is_active:
-                    if all: self.getPermissionsListIfAll(permissions, user)
-                    elif active: self.getPermissionsListIfActiveOrInactive(permissions, user, True)
-                    else: self.getPermissionsListIfActiveOrInactive(permissions, user, False)
+            if user.is_active:
+                if all: permissions = self.getPermissionsListIfAll(user)
+                elif active: permissions = self.getPermissionsListIfActiveOrInactive(user, True)
+                else: permissions = self.getPermissionsListIfActiveOrInactive(user, False)
+        return permissions
 
     def filterClass(self, Object, request, extra_conditions={}):
         kwargs={}

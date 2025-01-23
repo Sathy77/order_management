@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # 'django_rest_passwordreset',
 
     # 'contribution.apps.ContributionConfig',
+    'noauth.apps.NoauthConfig',
     'user.apps.UserConfig',
     'user_auth.apps.UserAuthConfig',
     'product.apps.ProductConfig',

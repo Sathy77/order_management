@@ -5,19 +5,34 @@ import os
 
 class Minihelps(Microhelps):
 
-    def getPermissionsListIfAll(self, permissions, user):
+    # def getPermissionsListIfAll(self, permissions, user):
+    #     permissions_dict = {}
+    #     for role in user.role.all():
+    #         for permission in role.permission.all():
+    #             permissions_dict.update({permission.name: ''})
+    #     permissions.extend([permission.lower() for permission in permissions_dict.keys()])
+
+    # def getPermissionsListIfActiveOrInactive(self, permissions, user, is_active):
+    #     permissions_dict = {}
+    #     for role in user.role.all():
+    #         for permission in role.permission.filter(is_active=is_active):
+    #             permissions_dict.update({permission.name: ''})
+    #     permissions.extend([permission.lower() for permission in permissions_dict.keys()])
+
+    def getPermissionsListIfAll(self, user):
         permissions_dict = {}
-        for role in user.role.all():
+        for role in user.role_permission.all():
             for permission in role.permission.all():
                 permissions_dict.update({permission.name: ''})
-        permissions.extend([permission.lower() for permission in permissions_dict.keys()])
+        return [permission.lower() for permission in permissions_dict.keys()]
 
-    def getPermissionsListIfActiveOrInactive(self, permissions, user, is_active):
+    def getPermissionsListIfActiveOrInactive(self, user, is_active):
         permissions_dict = {}
-        for role in user.role.all():
-            for permission in role.permission.filter(is_active=is_active):
+        for role in user.role_permission.all():
+            tem_permissions = role.permission.filter(is_active=is_active)
+            for permission in tem_permissions:
                 permissions_dict.update({permission.name: ''})
-        permissions.extend([permission.lower() for permission in permissions_dict.keys()])
+        return [permission.lower() for permission in permissions_dict.keys()]
     
 
 

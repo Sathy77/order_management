@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('__admin__/<str:username>/<str:password>', createUser, name='__admin__'),
     path('auth/', include('user_auth.urls')),
+    path('noauth/', include('noauth.urls')),
     path('api/user/', include('user.urls')),
     path('api/product/', include('product.urls')),
     path('api/zone/', include('zone.urls')),
