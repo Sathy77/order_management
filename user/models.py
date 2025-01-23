@@ -31,9 +31,6 @@ class Permission(Basic):
 class Role(Basic):
     name = models.CharField(max_length=50, blank=True, null=True)
     permission = models.ManyToManyField(Permission, blank=True, related_name='permission')
-    # active = models.BooleanField(default=True)
-    # created_at = models.DateTimeField(auto_now_add=True)
-    # updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.id} - {self.name}'
