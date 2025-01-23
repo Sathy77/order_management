@@ -183,7 +183,6 @@ def addorder_noauth(request):
                                 elif responsesuccessflag == 'error': response_message.extend(responsemessage)
                             elif user.exists(): 
                                 user = user.first()
-                                # extra_fields = {'username': contact_no, 'password': make_password(f'PASS{contact_no}'), 'user_type': CHOICE.USER_TYPE[1][1]}
                                 if userid: extra_fields.update({'updated_by': userid})
                                 allowed_fields=['name', 'address', 'contact_no', 'email']
                                 fields_regex = [{'field': 'contact_no', 'type': 'phonenumber'}]
@@ -195,8 +194,6 @@ def addorder_noauth(request):
                                     data=request.data,
                                     allowed_fields = allowed_fields,
                                     unique_fields=['contact_no'],
-                                    # freez_update=freez_update,
-                                    # extra_fields=extra_fields,
                                     fields_regex=fields_regex
                                 )
                                 if responsesuccessflag == 'success': user = responsedata.instance
