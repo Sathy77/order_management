@@ -21,14 +21,14 @@ class Minihelps(Microhelps):
 
     def getPermissionsListIfAll(self, user):
         permissions_dict = {}
-        for role in user.role_permission.all():
+        for role in user.role.all():
             for permission in role.permission.all():
                 permissions_dict.update({permission.name: ''})
         return [permission.lower() for permission in permissions_dict.keys()]
 
     def getPermissionsListIfActiveOrInactive(self, user, is_active):
         permissions_dict = {}
-        for role in user.role_permission.all():
+        for role in user.role.all():
             tem_permissions = role.permission.filter(is_active=is_active)
             for permission in tem_permissions:
                 permissions_dict.update({permission.name: ''})
