@@ -196,7 +196,7 @@ def addorder_noauth(request):
                                     allowed_fields = allowed_fields,
                                     unique_fields=['contact_no'],
                                     # freez_update=freez_update,
-                                    extra_fields=extra_fields,
+                                    # extra_fields=extra_fields,
                                     fields_regex=fields_regex
                                 )
                                 if responsesuccessflag == 'success': user = responsedata.instance
